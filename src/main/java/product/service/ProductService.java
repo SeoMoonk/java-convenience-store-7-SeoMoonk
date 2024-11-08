@@ -1,6 +1,7 @@
 package product.service;
 
 import static global.utils.StringParser.parseInt;
+import static product.constants.ProductStatic.getProductPresetKeys;
 
 import global.dto.response.FileParsedResponse;
 import global.utils.FileParser;
@@ -18,12 +19,41 @@ public class ProductService {
     }
     
     public void setUp(String filePath) {
-        FileParsedResponse fileParsedResponse = FileParser.parsingByFilePath(filePath);
+        FileParsedResponse productData = FileParser.parsingByFilePath(filePath);
+        productKeysValidate(productData.keys());
 
-        List<List<String>> values = fileParsedResponse.values();
-
-        for(List<String> value: values) {
+        List<List<String>> productValues = productData.values();
+        for (List<String> value : productValues) {
             create(value);
+        }
+    }
+
+    private void productKeysValidate(List<String> keys) {
+        List<String> productPresetKeys = getProductPresetKeys();
+        keysCountValidate(keys.size(), productPresetKeys.size());
+        keysContainsValidate(keys, productPresetKeys);
+        keysOrderValidate(keys, productPresetKeys);
+    }
+
+    private void keysCountValidate(int keyCount, int presetKeyCount) {
+        if (keyCount != presetKeyCount) {
+            throw new IllegalArgumentException("파일의 키 값이 %d개 여야 합니다".formatted(presetKeyCount));
+        }
+    }
+
+    private void keysContainsValidate(List<String> keys, List<String> presetKeys) {
+        for (String presetKey : presetKeys) {
+            if (!keys.contains(presetKey)) {
+                throw new IllegalArgumentException("파일에서 사전 설정 키 값을 찾을 수 없습니다" + presetKey);
+            }
+        }
+    }
+
+    private void keysOrderValidate(List<String> keys, List<String> presetKeys) {
+        for (int i = 0; i < keys.size(); i++) {
+            if (!keys.get(i).equals(presetKeys.get(i))) {
+                throw new IllegalArgumentException("파일의 데이터 키 순서가 일치하지 않습니다");
+            }
         }
     }
 
