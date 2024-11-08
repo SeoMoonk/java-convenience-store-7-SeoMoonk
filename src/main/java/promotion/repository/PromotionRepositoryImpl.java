@@ -16,11 +16,8 @@ public class PromotionRepositoryImpl implements PromotionRepository {
 
     @Override
     public Optional<Promotion> findByName(String name) {
-        for (Promotion p : storage) {
-            if (p.getName().equals(name)) {
-                return Optional.of(p);
-            }
-        }
-        return Optional.empty();
+        return storage.stream()
+                .filter(p -> name.equals(p.getName()))
+                .findFirst();
     }
 }

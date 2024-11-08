@@ -3,8 +3,8 @@ package promotion.service;
 import static global.utils.FileParser.parsingByFilePath;
 import static global.utils.StringParser.parseDate;
 import static global.utils.StringParser.parseInt;
-import static promotion.contants.PromotionStatic.PRESET_KEY_COUNT;
-import static promotion.contants.PromotionStatic.getPresetPromotionKeys;
+import static promotion.constants.PromotionStatic.PROMOTION_PRESET_KEY_COUNT;
+import static promotion.constants.PromotionStatic.getPromotionPresetKeys;
 
 import global.dto.response.FileParsedResponse;
 import java.time.LocalDate;
@@ -26,22 +26,22 @@ public class PromotionService {
         promotionKeysValidate(promotionData.keys());
 
         List<List<String>> promotionValues = promotionData.values();
-        for(List<String> valueItem : promotionValues) {
+        for (List<String> valueItem : promotionValues) {
             createByValueItem(valueItem);
         }
     }
-    
+
     //FIXME: 리팩토링 필요
     private void promotionKeysValidate(List<String> keys) {
-        List<String> presetPromotionKeys = getPresetPromotionKeys();
+        List<String> presetPromotionKeys = getPromotionPresetKeys();
         keysCountValidate(keys.size());
         keysContainsValidate(keys, presetPromotionKeys);
         keysOrderValidate(keys, presetPromotionKeys);
     }
 
     private void keysCountValidate(int keyCount) {
-        if(keyCount != PRESET_KEY_COUNT) {
-            throw new IllegalArgumentException("파일의 키 값이 %d개 여야 합니다".formatted(PRESET_KEY_COUNT));
+        if (keyCount != PROMOTION_PRESET_KEY_COUNT) {
+            throw new IllegalArgumentException("파일의 키 값이 %d개 여야 합니다".formatted(PROMOTION_PRESET_KEY_COUNT));
         }
     }
 
@@ -71,7 +71,12 @@ public class PromotionService {
         promotionRepository.save(promotion);
     }
 
-    public Optional<Promotion> getByName(String name) {
-        return promotionRepository.findByName(name);
+    public Promotion getByName(String name) {
+        Optional<Promotion> maybePromotion = promotionRepository.findByName(name);
+        if (maybePromotion.isEmpty()) {
+            //FIXME: 예외 유형 확인
+            throw new IllegalArgumentException("해당 이름을 가진 프로모션을 찾을 수 없습니다 : " + name);
+        }
+        return maybePromotion.get();
     }
 }

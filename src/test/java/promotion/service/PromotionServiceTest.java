@@ -2,6 +2,7 @@ package promotion.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,10 +25,12 @@ class PromotionServiceTest {
         promotionService.setUp(testFilePath);
 
         //then
-        Optional<Promotion> maybePromotion = promotionService.getByName("testName");
-        assertThat(maybePromotion.isPresent()).isTrue();
-        assertThat(maybePromotion.get().getName()).isEqualTo("testName");
-        assertThat(maybePromotion.get().getConditionQuantity()).isEqualTo(2);
+        Promotion promotion = promotionService.getByName("testName");
+        assertThat(promotion.getName()).isEqualTo("testName");
+        assertThat(promotion.getConditionQuantity()).isEqualTo(2);
+        assertThat(promotion.getBonusQuantity()).isEqualTo(1);
+        assertThat(promotion.getStartDate()).isEqualTo(LocalDate.parse("2024-01-01"));
+        assertThat(promotion.getEndDate()).isEqualTo("2024-12-31");
     }
 
 }
