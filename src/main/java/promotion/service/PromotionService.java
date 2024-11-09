@@ -4,6 +4,7 @@ import static global.utils.FileParser.parsingByFilePath;
 import static global.utils.StringParser.parseDate;
 import static global.utils.StringParser.parseInt;
 
+import camp.nextstep.edu.missionutils.DateTimes;
 import global.constants.FileType;
 import java.time.LocalDate;
 import java.util.List;
@@ -47,5 +48,10 @@ public class PromotionService {
             throw new IllegalArgumentException("해당 이름을 가진 프로모션을 찾을 수 없습니다 : " + name);
         }
         return maybePromotion.get();
+    }
+
+    public List<Promotion> getActivePromotions() {
+        LocalDate today = DateTimes.now().toLocalDate();
+        return promotionRepository.findAllByStartDateBeforeAndEndDateAfter(today);
     }
 }

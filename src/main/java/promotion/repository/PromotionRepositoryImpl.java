@@ -1,5 +1,6 @@
 package promotion.repository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,5 +20,13 @@ public class PromotionRepositoryImpl implements PromotionRepository {
         return storage.stream()
                 .filter(p -> name.equals(p.getName()))
                 .findFirst();
+    }
+
+    @Override
+    public List<Promotion> findAllByStartDateBeforeAndEndDateAfter(LocalDate now) {
+        return storage.stream()
+                .filter(p -> !now.isBefore(p.getStartDate()))
+                .filter(p -> !now.isAfter(p.getEndDate()))
+                .toList();
     }
 }
