@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import product.constants.ProductPresetKeys;
 import product.dto.response.ProductInfo;
+import product.dto.response.PurchaseInfo;
 import product.entity.Product;
 import product.repository.ProductRepository;
 import promotion.entity.Promotion;
@@ -89,7 +90,7 @@ public class ProductService {
     }
 
     public void processingPurchase(List<PurchaseRequest> purchaseRequests) {
-        for(PurchaseRequest request : purchaseRequests) {
+        for (PurchaseRequest request : purchaseRequests) {
             List<Product> products = getAllByName(request.productName());
             modifyQuantities(products, request.quantity());
         }
@@ -98,19 +99,44 @@ public class ProductService {
     public void modifyQuantities(List<Product> targetProducts, int purchaseQuantity) {
         Product target = targetProducts.remove(0);
 
-        if(target.getQuantity() >= purchaseQuantity) {
+        if (target.getQuantity() >= purchaseQuantity) {
             target.subtractQuantity(purchaseQuantity);
             return;
         }
 
-        while(purchaseQuantity != 0) {
+        while (purchaseQuantity != 0) {
             int currentQuantity = Math.min(target.getQuantity(), purchaseQuantity);
             target.subtractQuantity(currentQuantity);
             purchaseQuantity -= currentQuantity;
 
-            if(!targetProducts.isEmpty()) {
+            if (!targetProducts.isEmpty()) {
                 target = targetProducts.remove(0);
             }
         }
+    }
+
+    public List<PurchaseInfo> getPurchaseInfos(List<PurchaseRequest> requests, List<Promotion> promotions) {
+        List<PurchaseInfo> purchaseInfos = new ArrayList<>();
+        for (PurchaseRequest request : requests) {
+            Optional<Product> maybeProduct = productRepository.findByNameAndHasPromotion(request.productName());
+            if (maybeProduct.isPresent() && promotions.contains(maybeProduct.get().getPromotion())) {
+                purchaseInfos.add(getPurchaseInfo(request, maybeProduct.get().getQuantity()));
+            } else {
+                //FIXME : else 예약어 사용 금지
+                purchaseInfos.add(getPurchaseInfo(request, getByName(request.productName()).getQuantity()));
+            }
+        }
+        return purchaseInfos;
+    }
+
+    private PurchaseInfo getPurchaseInfo(PurchaseRequest request, int remainingQuantity) {
+        String productName = request.productName();
+        int purchaseQuantity = request.quantity();
+
+        if (remainingQuantity < purchaseQuantity) {
+            return new PurchaseInfo(productName, purchaseQuantity - remainingQuantity, remainingQuantity);
+        }
+
+        return new PurchaseInfo(productName, 0, purchaseQuantity);
     }
 }

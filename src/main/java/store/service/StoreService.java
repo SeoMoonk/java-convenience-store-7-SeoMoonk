@@ -6,7 +6,9 @@ import static promotion.constants.PromotionStatic.PROMOTION_FILE_PATH;
 
 import java.util.List;
 import product.dto.response.ProductInfo;
+import product.dto.response.PurchaseInfo;
 import product.service.ProductService;
+import promotion.entity.Promotion;
 import promotion.service.PromotionService;
 import store.dto.request.PurchaseRequest;
 
@@ -30,6 +32,7 @@ public class StoreService {
     }
 
     public void purchase(List<PurchaseRequest> purchaseRequests) {
+        collectPromotion(purchaseRequests);
         productService.processingPurchase(purchaseRequests);
 
         /*
@@ -49,5 +52,20 @@ public class StoreService {
                         ERROR_MSG_PREFIX + "재고의 물량이 부족합니다. 다시 확인해 주세요 : " + request.productName());
             }
         }
+    }
+
+    public List<Promotion> collectPromotion(List<PurchaseRequest> purchaseRequests) {
+        List<Promotion> activePromotions = promotionService.getActivePromotions();
+        List<PurchaseInfo> purchaseInfos = productService.getPurchaseInfos(purchaseRequests, activePromotions);
+
+        for(PurchaseInfo info : purchaseInfos) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(info.productName());
+            sb.append(info.normalPurchaseQuantity());
+            sb.append(info.bonusPurchaseQuantity());
+            System.out.println(sb);
+        }
+
+        return activePromotions;
     }
 }

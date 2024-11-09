@@ -3,6 +3,7 @@ package product.repository;
 import java.util.List;
 import java.util.Optional;
 import product.entity.Product;
+import promotion.entity.Promotion;
 
 public interface ProductRepository {
     void save(Product product);
@@ -10,4 +11,5 @@ public interface ProductRepository {
     List<Product> findAll();
     List<Product> findAllByName(String name);
     int countAllByName(String name);
+    Optional<Product> findByNameAndHasPromotion(String name);
 }

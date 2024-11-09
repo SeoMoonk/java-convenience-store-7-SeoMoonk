@@ -40,4 +40,12 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .mapToInt(Product::getQuantity)
                 .sum();
     }
+
+    @Override
+    public Optional<Product> findByNameAndHasPromotion(String name) {
+        return storage.stream()
+                .filter(p -> name.equals(p.getName()))
+                .filter(p -> Optional.ofNullable(p.getPromotion()).isPresent()) // Optional 사용
+                .findFirst();
+    }
 }
