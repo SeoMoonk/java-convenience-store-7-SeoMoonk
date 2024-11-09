@@ -1,5 +1,6 @@
 package product.service;
 
+import static global.constants.GlobalStatic.ERROR_MSG_PREFIX;
 import static global.utils.StringParser.parseInt;
 
 import global.constants.FileType;
@@ -14,6 +15,7 @@ import product.entity.Product;
 import product.repository.ProductRepository;
 import promotion.entity.Promotion;
 import promotion.service.PromotionService;
+import store.dto.request.PurchaseRequest;
 
 public class ProductService {
 
@@ -46,8 +48,7 @@ public class ProductService {
     public Product getByName(String name) {
         Optional<Product> maybeProduct = productRepository.findByName(name);
         if (maybeProduct.isEmpty()) {
-            //FIXME: 예외 유형 확인
-            throw new IllegalArgumentException("해당 이름을 가진 제품을 찾을 수 없습니다");
+            throw new IllegalArgumentException(ERROR_MSG_PREFIX + "해당 이름을 가진 제품을 찾을 수 없습니다 : " + name);
         }
         return maybeProduct.get();
     }
@@ -64,15 +65,52 @@ public class ProductService {
 
     public List<ProductInfo> getProductInfos() {
         List<Product> products = getAll();
-        List<ProductInfo> productInfos= new ArrayList<>();
-        for(Product product : products) {
+        List<ProductInfo> productInfos = new ArrayList<>();
+        for (Product product : products) {
             productInfos.add(ProductInfo.fromProduct(product));
         }
-
         return productInfos;
     }
 
     private List<Product> getAll() {
         return productRepository.findAll();
+    }
+
+    public List<Product> getAllByName(String name) {
+        List<Product> products = productRepository.findAllByName(name);
+        if (products.isEmpty()) {
+            throw new IllegalArgumentException(ERROR_MSG_PREFIX + "해당 이름을 가진 제품을 찾을 수 없습니다" + name);
+        }
+        return new ArrayList<>(products);
+    }
+
+    public int getQuantityByName(String name) {
+        return productRepository.countAllByName(name);
+    }
+
+    public void processingPurchase(List<PurchaseRequest> purchaseRequests) {
+        for(PurchaseRequest request : purchaseRequests) {
+            List<Product> products = getAllByName(request.productName());
+            modifyQuantities(products, request.quantity());
+        }
+    }
+
+    public void modifyQuantities(List<Product> targetProducts, int purchaseQuantity) {
+        Product target = targetProducts.remove(0);
+
+        if(target.getQuantity() >= purchaseQuantity) {
+            target.subtractQuantity(purchaseQuantity);
+            return;
+        }
+
+        while(purchaseQuantity != 0) {
+            int currentQuantity = Math.min(target.getQuantity(), purchaseQuantity);
+            target.subtractQuantity(currentQuantity);
+            purchaseQuantity -= currentQuantity;
+
+            if(!targetProducts.isEmpty()) {
+                target = targetProducts.remove(0);
+            }
+        }
     }
 }

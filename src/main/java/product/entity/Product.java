@@ -1,7 +1,5 @@
 package product.entity;
 
-import java.text.DecimalFormat;
-import product.dto.response.ProductInfo;
 import promotion.entity.Promotion;
 
 public class Product {
@@ -56,5 +54,9 @@ public class Product {
             return "";
         }
         return promotion.getName();
+    }
+
+    public void subtractQuantity(int subtractQuantity) {
+        this.quantity -= subtractQuantity;
     }
 }

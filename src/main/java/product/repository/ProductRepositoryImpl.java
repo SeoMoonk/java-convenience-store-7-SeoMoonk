@@ -25,4 +25,19 @@ public class ProductRepositoryImpl implements ProductRepository {
     public List<Product> findAll() {
         return new ArrayList<>(storage);
     }
+
+    @Override
+    public List<Product> findAllByName(String name) {
+        return storage.stream()
+                .filter(p -> name.equals(p.getName()))
+                .toList();
+    }
+
+    @Override
+    public int countAllByName(String name) {
+        return storage.stream()
+                .filter(p -> name.equals(p.getName()))
+                .mapToInt(Product::getQuantity)
+                .sum();
+    }
 }

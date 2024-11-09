@@ -22,7 +22,7 @@ class PromotionServiceTest {
         String testFilePath = "src/main/resources/testpromotion.md";
 
         //when
-        promotionService.setUp(testFilePath);
+        promotionService.loadFromFilePath(testFilePath);
 
         //then
         Promotion promotion = promotionService.getByName("testName");

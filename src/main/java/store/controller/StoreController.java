@@ -1,8 +1,10 @@
 package store.controller;
 
+import static global.constants.GlobalStatic.ERROR_MSG_PREFIX;
+
 import java.util.List;
-import java.util.Map;
 import product.dto.response.ProductInfo;
+import store.dto.request.PurchaseRequest;
 import store.service.StoreService;
 import store.utils.ItemParser;
 import store.view.StoreInputView;
@@ -32,8 +34,16 @@ public class StoreController {
 
     public void purchaseRequest() {
         String inputItems = storeInputView.readItems();
-        Map<String, Integer> productSets = ItemParser.parseItems(inputItems);
+        List<PurchaseRequest> purchaseRequests = ItemParser.parseItems(inputItems);
+        try {
+            storeService.tryPurchase(purchaseRequests);
+        } catch (IllegalArgumentException e) {
+            System.out.println(ERROR_MSG_PREFIX + e.getMessage());
+            purchaseRequest();
+        }
 
-        System.out.println(productSets);
+        System.out.println("----------판매 후--------");
+        List<ProductInfo> productInfos = storeService.getProductInfos();
+        storeOutputView.printProductInfos(productInfos);
     }
 }

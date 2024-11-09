@@ -26,7 +26,7 @@ class ProductServiceTest {
         String testFilePath = "src/main/resources/testproducts.md";
 
         //when
-        productService.setUp(testFilePath);
+        productService.loadFromFilePath(testFilePath);
 
         //then
         Product testProduct = productService.getByName("testProduct");
@@ -40,8 +40,8 @@ class ProductServiceTest {
     @DisplayName("재고를 등록할 때, 프로모션 정보가 있다면 연결시켜준다.")
     void t002() {
         //givne, when
-        promotionService.setUp("src/main/resources/testpromotion.md");
-        productService.setUp("src/main/resources/testproducts.md");
+        promotionService.loadFromFilePath("src/main/resources/testpromotion.md");
+        productService.loadFromFilePath("src/main/resources/testproducts.md");
 
         //then
         Product testProduct = productService.getByName("testProduct");
