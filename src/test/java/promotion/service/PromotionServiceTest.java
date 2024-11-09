@@ -3,6 +3,7 @@ package promotion.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,21 @@ class PromotionServiceTest {
         assertThat(promotion.getBonusQuantity()).isEqualTo(1);
         assertThat(promotion.getStartDate()).isEqualTo(LocalDate.parse("2024-01-01"));
         assertThat(promotion.getEndDate()).isEqualTo("2024-12-31");
+    }
+
+    @Test
+    @DisplayName("오늘 활성화중인 프로모션 리스트를 받아올 수 있다")
+    void t002() {
+        //given
+        String testFilePath = "src/main/resources/testpromotion.md";
+        promotionService.loadFromFilePath(testFilePath);
+
+        //when
+        List<Promotion> activePromotions = promotionService.getActivePromotions();
+
+        //then
+        assertThat(activePromotions.get(0).getName()).isEqualTo("testPromotion");
+        assertThat(activePromotions.get(1).getName()).isEqualTo("testPromotion3");
     }
 
 }
