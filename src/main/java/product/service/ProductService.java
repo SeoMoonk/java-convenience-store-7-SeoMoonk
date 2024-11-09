@@ -89,54 +89,60 @@ public class ProductService {
         return productRepository.countAllByName(name);
     }
 
-    public void processingPurchase(List<PurchaseRequest> purchaseRequests) {
-        for (PurchaseRequest request : purchaseRequests) {
-            List<Product> products = getAllByName(request.productName());
-            modifyQuantities(products, request.quantity());
-        }
-    }
-
-    public void modifyQuantities(List<Product> targetProducts, int purchaseQuantity) {
-        Product target = targetProducts.remove(0);
-
-        if (target.getQuantity() >= purchaseQuantity) {
-            target.subtractQuantity(purchaseQuantity);
-            return;
-        }
-
-        while (purchaseQuantity != 0) {
-            int currentQuantity = Math.min(target.getQuantity(), purchaseQuantity);
-            target.subtractQuantity(currentQuantity);
-            purchaseQuantity -= currentQuantity;
-
-            if (!targetProducts.isEmpty()) {
-                target = targetProducts.remove(0);
-            }
-        }
-    }
+//
+//    public void modifyQuantities(List<Product> targetProducts, int purchaseQuantity) {
+//        Product target = targetProducts.remove(0);
+//
+//        if (target.getQuantity() >= purchaseQuantity) {
+//            target.subtractQuantity(purchaseQuantity);
+//            return;
+//        }
+//
+//        while (purchaseQuantity != 0) {
+//            int currentQuantity = Math.min(target.getQuantity(), purchaseQuantity);
+//            target.subtractQuantity(currentQuantity);
+//            purchaseQuantity -= currentQuantity;
+//
+//            if (!targetProducts.isEmpty()) {
+//                target = targetProducts.remove(0);
+//            }
+//        }
+//    }
 
     public List<PurchaseInfo> getPurchaseInfos(List<PurchaseRequest> requests, List<Promotion> promotions) {
         List<PurchaseInfo> purchaseInfos = new ArrayList<>();
         for (PurchaseRequest request : requests) {
             Optional<Product> maybeProduct = productRepository.findByNameAndHasPromotion(request.productName());
             if (maybeProduct.isPresent() && promotions.contains(maybeProduct.get().getPromotion())) {
-                purchaseInfos.add(getPurchaseInfo(request, maybeProduct.get().getQuantity()));
-            } else {
-                //FIXME : else 예약어 사용 금지
-                purchaseInfos.add(getPurchaseInfo(request, getByName(request.productName()).getQuantity()));
+                purchaseInfos.add(getPurchaseInfo(request, maybeProduct.get()));
+                continue;
             }
+            purchaseInfos.add(getPurchaseInfo(request, getByName(request.productName())));
         }
         return purchaseInfos;
     }
 
-    private PurchaseInfo getPurchaseInfo(PurchaseRequest request, int remainingQuantity) {
-        String productName = request.productName();
+    private PurchaseInfo getPurchaseInfo(PurchaseRequest request, Product product) {
+        int remainingQuantity = product.getQuantity();
         int purchaseQuantity = request.quantity();
 
         if (remainingQuantity < purchaseQuantity) {
-            return new PurchaseInfo(productName, purchaseQuantity - remainingQuantity, remainingQuantity);
+            return new PurchaseInfo(product, purchaseQuantity - remainingQuantity, remainingQuantity);
         }
 
-        return new PurchaseInfo(productName, 0, purchaseQuantity);
+        return new PurchaseInfo(product, 0, purchaseQuantity);
+    }
+
+    public void purchase(PurchaseInfo info) {
+        if(info.bonusPurchaseQuantity() != 0) {
+            info.product().subtractQuantity(info.bonusPurchaseQuantity());
+        }
+        if(info.normalPurchaseQuantity() != 0 && info.product().getPromotion() != null) {
+            Product product = productRepository.findByNameAndNotHasPromotion(info.product().getName()).get();
+            product.subtractQuantity(info.normalPurchaseQuantity());
+        }
+        if(info.normalPurchaseQuantity() != 0 && info.product().getPromotion() == null) {
+            info.product().subtractQuantity(info.normalPurchaseQuantity());
+        }
     }
 }

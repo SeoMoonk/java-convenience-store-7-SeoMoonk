@@ -32,15 +32,21 @@ public class StoreService {
     }
 
     public void purchase(List<PurchaseRequest> purchaseRequests) {
-        collectPromotion(purchaseRequests);
-        productService.processingPurchase(purchaseRequests);
-
+        List<PurchaseInfo> purchaseInfos = collectPurchaseInfos(purchaseRequests);
+        for (PurchaseInfo info : purchaseInfos) {
+            productService.purchase(info);
+        }
         /*
         TODO :
          1. 일반 물품 처리
          2. 프로모션 물품 처리
          3. 총 몇 개가 결제되었고, 그 중 몇 개가 프로모션 제품인지 반환
          */
+
+        List<ProductInfo> productInfos = productService.getProductInfos();
+        for (ProductInfo info : productInfos) {
+            System.out.println(info.toString());
+        }
     }
 
     public void checkStorageStatus(List<PurchaseRequest> purchaseRequests) {
@@ -54,18 +60,9 @@ public class StoreService {
         }
     }
 
-    public List<Promotion> collectPromotion(List<PurchaseRequest> purchaseRequests) {
+    public List<PurchaseInfo> collectPurchaseInfos(List<PurchaseRequest> purchaseRequests) {
         List<Promotion> activePromotions = promotionService.getActivePromotions();
         List<PurchaseInfo> purchaseInfos = productService.getPurchaseInfos(purchaseRequests, activePromotions);
-
-        for(PurchaseInfo info : purchaseInfos) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(info.productName());
-            sb.append(info.normalPurchaseQuantity());
-            sb.append(info.bonusPurchaseQuantity());
-            System.out.println(sb);
-        }
-
-        return activePromotions;
+        return purchaseInfos;
     }
 }

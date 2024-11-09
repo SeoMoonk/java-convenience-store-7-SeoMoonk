@@ -12,4 +12,5 @@ public interface ProductRepository {
     List<Product> findAllByName(String name);
     int countAllByName(String name);
     Optional<Product> findByNameAndHasPromotion(String name);
+    Optional<Product> findByNameAndNotHasPromotion(String name);
 }

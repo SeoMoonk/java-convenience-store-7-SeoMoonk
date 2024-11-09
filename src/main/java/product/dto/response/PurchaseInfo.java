@@ -1,7 +1,9 @@
 package product.dto.response;
 
+import product.entity.Product;
+
 public record PurchaseInfo(
-        String productName,
+        Product product,
         int normalPurchaseQuantity,
         int bonusPurchaseQuantity
 ) {

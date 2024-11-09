@@ -48,4 +48,12 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .filter(p -> Optional.ofNullable(p.getPromotion()).isPresent()) // Optional 사용
                 .findFirst();
     }
+
+    @Override
+    public Optional<Product> findByNameAndNotHasPromotion(String name) {
+        return storage.stream()
+                .filter(p -> name.equals(p.getName()))
+                .filter(p -> Optional.ofNullable(p.getPromotion()).isEmpty())
+                .findFirst();
+    }
 }
