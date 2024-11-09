@@ -1,5 +1,6 @@
 package store;
 
+import java.util.List;
 import product.repository.ProductRepository;
 import product.repository.ProductRepositoryImpl;
 import product.service.ProductService;
@@ -7,6 +8,7 @@ import promotion.repository.PromotionRepository;
 import promotion.repository.PromotionRepositoryImpl;
 import promotion.service.PromotionService;
 import store.controller.StoreController;
+import store.dto.request.PurchaseRequest;
 import store.service.StoreService;
 import store.view.StoreInputView;
 import store.view.StoreOutputView;
@@ -25,7 +27,8 @@ public class Application {
     public static void main(String[] args) {
         storeController.setUp();
         storeController.visitStore();
-        storeController.purchaseRequest();
-        // TODO: 프로그램 구현
+        List<PurchaseRequest> purchaseRequests = storeController.shoppingRequest();
+        storeController.checkPurchaseRequest(purchaseRequests);
+        storeController.purchase(purchaseRequests);
     }
 }

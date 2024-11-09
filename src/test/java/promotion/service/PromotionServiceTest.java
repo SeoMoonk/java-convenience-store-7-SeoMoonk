@@ -25,8 +25,8 @@ class PromotionServiceTest {
         promotionService.loadFromFilePath(testFilePath);
 
         //then
-        Promotion promotion = promotionService.getByName("testName");
-        assertThat(promotion.getName()).isEqualTo("testName");
+        Promotion promotion = promotionService.getByName("testPromotion");
+        assertThat(promotion.getName()).isEqualTo("testPromotion");
         assertThat(promotion.getConditionQuantity()).isEqualTo(2);
         assertThat(promotion.getBonusQuantity()).isEqualTo(1);
         assertThat(promotion.getStartDate()).isEqualTo(LocalDate.parse("2024-01-01"));

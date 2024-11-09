@@ -1,12 +1,12 @@
 package store.controller;
 
-import static global.constants.GlobalStatic.ERROR_MSG_PREFIX;
+import static global.utils.StringParser.parseShoppingList;
 
+import java.util.ArrayList;
 import java.util.List;
 import product.dto.response.ProductInfo;
 import store.dto.request.PurchaseRequest;
 import store.service.StoreService;
-import store.utils.ItemParser;
 import store.view.StoreInputView;
 import store.view.StoreOutputView;
 
@@ -32,18 +32,28 @@ public class StoreController {
         storeOutputView.printProductInfos(productInfos);
     }
 
-    public void purchaseRequest() {
-        String inputItems = storeInputView.readItems();
-        List<PurchaseRequest> purchaseRequests = ItemParser.parseItems(inputItems);
+    public List<PurchaseRequest> shoppingRequest() {
+        String requestInput = storeInputView.inputShoppingList();
+        List<PurchaseRequest> purchaseRequests = new ArrayList<>();
         try {
-            storeService.tryPurchase(purchaseRequests);
-        } catch (IllegalArgumentException e) {
-            System.out.println(ERROR_MSG_PREFIX + e.getMessage());
-            purchaseRequest();
+            purchaseRequests = parseShoppingList(requestInput);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            shoppingRequest();
         }
+        return purchaseRequests;
+    }
 
-        System.out.println("----------판매 후--------");
-        List<ProductInfo> productInfos = storeService.getProductInfos();
-        storeOutputView.printProductInfos(productInfos);
+    public void checkPurchaseRequest(List<PurchaseRequest> purchaseRequests) {
+        try {
+            storeService.checkStorageStatus(purchaseRequests);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            shoppingRequest();
+        }
+    }
+
+    public void purchase(List<PurchaseRequest> purchaseRequests) {
+        storeService.purchase(purchaseRequests);
     }
 }

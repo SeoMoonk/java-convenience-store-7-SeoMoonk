@@ -2,7 +2,6 @@ package store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,7 @@ class StoreServiceTest {
         purchaseRequests.add(new PurchaseRequest("invalid", 3));
 
         //when, then
-        assertThatThrownBy(() -> storeService.tryPurchase(purchaseRequests))
+        assertThatThrownBy(() -> storeService.checkStorageStatus(purchaseRequests))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("invalid");
     }
@@ -51,7 +50,7 @@ class StoreServiceTest {
         purchaseRequests.add(new PurchaseRequest("콜라", 300));
 
         //when, then
-        assertThatThrownBy(() -> storeService.tryPurchase(purchaseRequests))
+        assertThatThrownBy(() -> storeService.checkStorageStatus(purchaseRequests))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("재고");
     }
@@ -65,7 +64,7 @@ class StoreServiceTest {
         int beforeQuantity = productService.getByName("콜라").getQuantity();
 
         //when
-        storeService.tryPurchase(purchaseRequests);
+        storeService.purchase(purchaseRequests);
 
         //then
         int afterQuantity = productService.getByName("콜라").getQuantity();

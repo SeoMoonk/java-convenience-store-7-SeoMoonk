@@ -6,7 +6,6 @@ import static promotion.constants.PromotionStatic.PROMOTION_FILE_PATH;
 
 import java.util.List;
 import product.dto.response.ProductInfo;
-import product.entity.Product;
 import product.service.ProductService;
 import promotion.service.PromotionService;
 import store.dto.request.PurchaseRequest;
@@ -30,12 +29,18 @@ public class StoreService {
         return productService.getProductInfos();
     }
 
-    public void tryPurchase(List<PurchaseRequest> purchaseRequests) {
-        checkStorageStatus(purchaseRequests);
+    public void purchase(List<PurchaseRequest> purchaseRequests) {
         productService.processingPurchase(purchaseRequests);
+
+        /*
+        TODO :
+         1. 일반 물품 처리
+         2. 프로모션 물품 처리
+         3. 총 몇 개가 결제되었고, 그 중 몇 개가 프로모션 제품인지 반환
+         */
     }
 
-    private void checkStorageStatus(List<PurchaseRequest> purchaseRequests) {
+    public void checkStorageStatus(List<PurchaseRequest> purchaseRequests) {
         for (PurchaseRequest request : purchaseRequests) {
             productService.getAllByName(request.productName());
             int storedQuantity = productService.getQuantityByName(request.productName());
