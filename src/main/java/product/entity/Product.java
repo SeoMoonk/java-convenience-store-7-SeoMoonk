@@ -1,5 +1,7 @@
 package product.entity;
 
+import promotion.entity.Promotion;
+
 public class Product {
 
     private String name;
@@ -8,13 +10,13 @@ public class Product {
 
     private int quantity;
 
-    private String promotionName;
+    private Promotion promotion;
 
-    public Product(String name, int price, int quantity, String promotionName) {
+    public Product(String name, int price, int quantity, Promotion promotion) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
-        this.promotionName = promotionName;
+        this.promotion = promotion;
     }
 
     public String getName() {
@@ -29,7 +31,7 @@ public class Product {
         return quantity;
     }
 
-    public String getPromotionName() {
-        return promotionName;
+    public Promotion getPromotion() {
+        return promotion;
     }
 }

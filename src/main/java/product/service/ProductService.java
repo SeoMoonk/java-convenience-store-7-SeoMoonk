@@ -10,12 +10,16 @@ import java.util.Optional;
 import product.constants.ProductPresetKeys;
 import product.entity.Product;
 import product.repository.ProductRepository;
+import promotion.entity.Promotion;
+import promotion.service.PromotionService;
 
 public class ProductService {
 
+    private final PromotionService promotionService;
     private final ProductRepository productRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(PromotionService promotionService, ProductRepository productRepository) {
+        this.promotionService = promotionService;
         this.productRepository = productRepository;
     }
 
@@ -31,8 +35,9 @@ public class ProductService {
         int price = parseInt(dataSet.get(ProductPresetKeys.PRODUCT_PRICE_PRESET_KEY.getKey()));
         int quantity = parseInt(dataSet.get(ProductPresetKeys.PRODUCT_QUANTITY_PRESET_KEY.getKey()));
         String promotionName = dataSet.get(ProductPresetKeys.PRODUCT_PROMOTION_NAME_PRESET_KEY.getKey());
+        Promotion promotion = promotionService.getByName(promotionName);
 
-        Product product = new Product(name, price, quantity, promotionName);
+        Product product = new Product(name, price, quantity, promotion);
         productRepository.save(product);
     }
 
