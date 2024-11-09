@@ -35,9 +35,9 @@ public class ProductService {
         int price = parseInt(dataSet.get(ProductPresetKeys.PRODUCT_PRICE_PRESET_KEY.getKey()));
         int quantity = parseInt(dataSet.get(ProductPresetKeys.PRODUCT_QUANTITY_PRESET_KEY.getKey()));
         String promotionName = dataSet.get(ProductPresetKeys.PRODUCT_PROMOTION_NAME_PRESET_KEY.getKey());
-        Promotion promotion = promotionService.getByName(promotionName);
+        Promotion promotionByName = getPromotionByName(promotionName);
 
-        Product product = new Product(name, price, quantity, promotion);
+        Product product = new Product(name, price, quantity, promotionByName);
         productRepository.save(product);
     }
 
@@ -48,5 +48,15 @@ public class ProductService {
             throw new IllegalArgumentException("해당 이름을 가진 제품을 찾을 수 없습니다");
         }
         return maybeProduct.get();
+    }
+
+    private Promotion getPromotionByName(String promotionName) {
+        Promotion promotion;
+        try {
+            promotion = promotionService.getByName(promotionName);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+        return promotion;
     }
 }

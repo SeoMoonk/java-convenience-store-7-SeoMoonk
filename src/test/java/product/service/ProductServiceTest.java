@@ -33,7 +33,7 @@ class ProductServiceTest {
         assertThat(testProduct.getName()).isEqualTo("testProduct");
         assertThat(testProduct.getQuantity()).isEqualTo(3);
         assertThat(testProduct.getPrice()).isEqualTo(1000);
-//        assertThat(testProduct.getPromotionName()).isEqualTo("테스트 프로모션");
+        assertThat(testProduct.getPromotion()).isNull();
     }
 
     @Test
