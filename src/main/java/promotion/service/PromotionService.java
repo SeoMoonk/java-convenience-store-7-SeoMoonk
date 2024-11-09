@@ -21,7 +21,7 @@ public class PromotionService {
         this.promotionRepository = promotionRepository;
     }
 
-    public void setUp(String promotionFilePath) {
+    public void loadFromFilePath(String promotionFilePath) {
         List<Map<String, String>> promotionDataSets = parsingByFilePath(promotionFilePath, FileType.PROMOTION);
         for (Map<String, String> dataSet : promotionDataSets) {
             createByDataSet(dataSet);

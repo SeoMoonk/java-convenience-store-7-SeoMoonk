@@ -4,10 +4,12 @@ import static global.utils.StringParser.parseInt;
 
 import global.constants.FileType;
 import global.utils.FileParser;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import product.constants.ProductPresetKeys;
+import product.dto.response.ProductInfo;
 import product.entity.Product;
 import product.repository.ProductRepository;
 import promotion.entity.Promotion;
@@ -23,7 +25,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public void setUp(String filePath) {
+    public void loadFromFilePath(String filePath) {
         List<Map<String, String>> productFileDataSets = FileParser.parsingByFilePath(filePath, FileType.PRODUCT);
         for (Map<String, String> dataSet : productFileDataSets) {
             createByDataSet(dataSet);
@@ -58,5 +60,19 @@ public class ProductService {
             return null;
         }
         return promotion;
+    }
+
+    public List<ProductInfo> getProductInfos() {
+        List<Product> products = getAll();
+        List<ProductInfo> productInfos= new ArrayList<>();
+        for(Product product : products) {
+            productInfos.add(ProductInfo.fromProduct(product));
+        }
+
+        return productInfos;
+    }
+
+    private List<Product> getAll() {
+        return productRepository.findAll();
     }
 }

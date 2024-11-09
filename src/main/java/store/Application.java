@@ -23,6 +23,8 @@ public class Application {
     private static final StoreController storeController = new StoreController(storeInputView, storeOutputView, storeService);
 
     public static void main(String[] args) {
+        storeController.setUp();
+        storeController.visitStore();
         storeController.purchaseRequest();
         // TODO: 프로그램 구현
     }

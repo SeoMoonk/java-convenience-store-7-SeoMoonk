@@ -20,4 +20,9 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .filter(p -> name.equals(p.getName()))
                 .findFirst();
     }
+
+    @Override
+    public List<Product> findAll() {
+        return new ArrayList<>(storage);
+    }
 }

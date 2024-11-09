@@ -3,6 +3,8 @@ package store.service;
 import static product.constants.ProductStatic.PRODUCT_FILE_PATH;
 import static promotion.constants.PromotionStatic.PROMOTION_FILE_PATH;
 
+import java.util.List;
+import product.dto.response.ProductInfo;
 import product.service.ProductService;
 import promotion.service.PromotionService;
 
@@ -17,7 +19,11 @@ public class StoreService {
     }
 
     public void setUp() {
-        promotionService.setUp(PROMOTION_FILE_PATH);
-        productService.setUp(PRODUCT_FILE_PATH);
+        promotionService.loadFromFilePath(PROMOTION_FILE_PATH);
+        productService.loadFromFilePath(PRODUCT_FILE_PATH);
+    }
+
+    public List<ProductInfo> getProductInfos() {
+        return productService.getProductInfos();
     }
 }

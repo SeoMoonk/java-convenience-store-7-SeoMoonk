@@ -1,5 +1,7 @@
 package product.entity;
 
+import java.text.DecimalFormat;
+import product.dto.response.ProductInfo;
 import promotion.entity.Promotion;
 
 public class Product {
@@ -33,5 +35,26 @@ public class Product {
 
     public Promotion getPromotion() {
         return promotion;
+    }
+
+    public String getFormattedPrice() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%,d", price));
+        sb.append("원");
+        return sb.toString();
+    }
+
+    public String getFormattedQuantity() {
+        if(this.quantity == 0) {
+            return "재고 없음";
+        }
+        return String.valueOf(quantity) + "개";
+    }
+
+    public String getFormattedPromotionName() {
+        if(promotion == null) {
+            return "";
+        }
+        return promotion.getName();
     }
 }
