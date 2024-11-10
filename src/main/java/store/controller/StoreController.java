@@ -111,11 +111,15 @@ public class StoreController {
         String input;
         try {
             input = storeInputView.inputAnswerAboutMembership();
-            //TODO: 입력 유효성 검사
+            return input.equals("Y");   //FIXME: Y가 아니면 전부 FALSE
         } catch(Exception e) {
             System.out.println(e.getMessage());
             isContainsMembershipDiscount();
         }
         return false;
+    }
+
+    public void printReceipt(ReceiptItems receiptItems, ReceiptPriceInfo receiptPriceInfo) {
+        storeOutputView.printReceipt(receiptItems, receiptPriceInfo);
     }
 }

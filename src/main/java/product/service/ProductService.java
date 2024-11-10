@@ -90,22 +90,18 @@ public class ProductService {
 
     public boolean isPromotionTargetRequest(List<Promotion> promotions, PurchaseRequest request) {
         for (Promotion promotion : promotions) {
-            Product maybeProduct = getByNameAndPromotion(request.productName(), promotion);
+            Optional<Product> maybeProduct = getByNameAndPromotion(request.productName(), promotion);
 
-            int minQuantity = promotion.getBonusQuantity() + promotion.getConditionQuantity();
-            return maybeProduct.getQuantity() >= minQuantity;
+            if(maybeProduct.isPresent()) {
+                int minQuantity = promotion.getBonusQuantity() + promotion.getConditionQuantity();
+                return maybeProduct.get().getQuantity() >= minQuantity;
+            }
         }
         return false;
     }
 
-    public Product getByNameAndPromotion(String name, Promotion promotion) {
-        Optional<Product> maybeProduct = productRepository.findByNameAndPromotion(name, promotion);
-
-        if (maybeProduct.isEmpty()) {
-            throw new IllegalArgumentException("제품 정보를 찾아올 수 없습니다 : " + name);
-        }
-
-        return maybeProduct.get();
+    public Optional<Product> getByNameAndPromotion(String name, Promotion promotion) {
+        return productRepository.findByNameAndPromotion(name, promotion);
     }
 
     public Product getByNameAndHasPromotion(String name) {

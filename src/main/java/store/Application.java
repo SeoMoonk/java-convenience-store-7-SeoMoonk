@@ -15,6 +15,7 @@ import store.dto.request.PurchaseForm;
 import store.dto.request.PurchaseRequest;
 import store.dto.request.SeparatedPurchaseRequest;
 import store.dto.response.ReceiptItems;
+import store.dto.response.ReceiptPriceInfo;
 import store.service.PurchaseService;
 import store.service.StoreService;
 import store.view.StoreInputView;
@@ -46,6 +47,8 @@ public class Application {
         storeController.purchase(purchaseForms);
         ReceiptItems receiptItems = storeController.collectReceiptItems(promotionApplyResult,
                 separatedRequests.normalRequests());
-        storeController.processingReceiptPriceInfo(receiptItems, storeController.isContainsMembershipDiscount());
+        ReceiptPriceInfo receiptPriceInfo = storeController.processingReceiptPriceInfo(receiptItems,
+                storeController.isContainsMembershipDiscount());
+        storeController.printReceipt(receiptItems, receiptPriceInfo);
     }
 }

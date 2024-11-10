@@ -179,10 +179,8 @@ public class PurchaseService {
             int quantity = result.promotionPurchase();
             int bonusQuantity = result.bonusQuantity();
             int price = product.getPrice();
-            finalPurchases.add(
-                    new FinalPurchase(product.getName(), quantity, calculateTotalPrice(price, quantity)));
-            finalBonuses.add(
-                    new FinalBonus(product.getName(), bonusQuantity, calculateTotalPrice(price, bonusQuantity)));
+            finalPurchases.add(new FinalPurchase(product.getName(), quantity, price * quantity));
+            finalBonuses.add(new FinalBonus(product.getName(), bonusQuantity, price * bonusQuantity));
         }
         return new ReceiptItems(finalPurchases, finalBonuses);
     }
@@ -192,15 +190,10 @@ public class PurchaseService {
         for (PurchaseRequest request : normalRequests) {
             String productName = request.productName();
             Product product = productService.getByNameAndNotHasPromotion(productName);
-            int quantity = request.quantity();
-            finalPurchases.add(new FinalPurchase(request.productName(), request.quantity(),
-                    calculateTotalPrice(product.getPrice(), quantity)));
+            finalPurchases.add(new FinalPurchase(request.productName(), request.quantity()
+                    , product.getPrice() * request.quantity()));
         }
         return new ReceiptItems(finalPurchases, null);
-    }
-
-    private int calculateTotalPrice(int price, int quantity) {
-        return price * quantity;
     }
 
     private ReceiptItems integrateReceiptItems(ReceiptItems promotionReceiptItems, ReceiptItems normalReceiptItems) {

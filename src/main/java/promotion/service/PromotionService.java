@@ -140,6 +140,6 @@ public class PromotionService {
             return 8000;
         }
 
-        return Integer.parseInt(String.valueOf(result).split("\\.")[0]);
+        return (int) Math.round(result);
     }
 }

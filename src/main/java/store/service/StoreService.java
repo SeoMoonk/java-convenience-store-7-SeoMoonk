@@ -51,24 +51,33 @@ public class StoreService {
     public ReceiptPriceInfo processingReceiptPriceInfo(ReceiptItems items, boolean isContainsMembershipDiscount) {
         List<FinalPurchase> purchases = items.purchases();
         List<FinalBonus> bonuses = items.bonuses();
-        int totalAmount = calcTotalAmount(purchases, bonuses);
+        int totalQuantity = calcTotalQuantity(purchases);
         int promotionDiscount = calcPromotionDiscountAmount(bonuses);
+        int totalAmount = calcTotalAmount(purchases, bonuses) - promotionDiscount;
         int memberShipDiscount = 0;
         if(isContainsMembershipDiscount) {
             memberShipDiscount = promotionService.calcMembershipDiscountAmount(totalAmount, promotionDiscount);
         }
         int requiredAmount = totalAmount - promotionDiscount - memberShipDiscount;
 
-        return new ReceiptPriceInfo(totalAmount, promotionDiscount, memberShipDiscount, requiredAmount);
+        return new ReceiptPriceInfo(totalQuantity, totalAmount, promotionDiscount, memberShipDiscount, requiredAmount);
+    }
+
+    private int calcTotalQuantity(List<FinalPurchase> purchases) {
+        int amount = 0;
+        for(FinalPurchase purchase : purchases) {
+            amount += purchase.quantity();
+        }
+        return amount;
     }
 
     private int calcTotalAmount(List<FinalPurchase> purchases, List<FinalBonus> bonuses) {
         int amount = 0;
         for(FinalPurchase p : purchases) {
-            amount = amount + p.price() * p.quantity();
+            amount = amount + p.price();
         }
         for(FinalBonus b : bonuses) {
-            amount = amount + b.discountAmount() * b.bonusQuantity();
+            amount = amount + b.discountAmount();
         }
         return amount;
     }
@@ -76,7 +85,7 @@ public class StoreService {
     private int calcPromotionDiscountAmount(List<FinalBonus> bonuses) {
         int amount = 0;
         for(FinalBonus b : bonuses) {
-            amount = amount + b.discountAmount() * b.bonusQuantity();
+            amount = amount + b.discountAmount();
         }
         return amount;
     }
