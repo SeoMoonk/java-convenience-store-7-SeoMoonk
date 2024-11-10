@@ -131,4 +131,15 @@ public class PromotionService {
     public void vacateRepository() {
         promotionRepository.removeAll();
     }
+
+    public int calcMembershipDiscountAmount(int totalAmount, int promotionDiscountAmount) {
+        int targetAmount = totalAmount - promotionDiscountAmount;
+        double result = targetAmount * 0.3;
+
+        if(result > 8000) {
+            return 8000;
+        }
+
+        return Integer.parseInt(String.valueOf(result).split("\\.")[0]);
+    }
 }

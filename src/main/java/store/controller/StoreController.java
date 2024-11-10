@@ -9,7 +9,8 @@ import promotion.dto.response.PromotionApplyResult;
 import store.dto.request.PurchaseForm;
 import store.dto.request.PurchaseRequest;
 import store.dto.request.SeparatedPurchaseRequest;
-import store.dto.response.ReceipItems;
+import store.dto.response.ReceiptItems;
+import store.dto.response.ReceiptPriceInfo;
 import store.service.PurchaseService;
 import store.service.StoreService;
 import store.view.StoreInputView;
@@ -69,7 +70,7 @@ public class StoreController {
         return purchaseService.processingPurChaseRequests(promotionApplyResults, normalRequests);
     }
 
-    public ReceipItems getRecieptItems(List<PromotionApplyResult> promotionApplyResults, List<PurchaseRequest> normalRequests) {
+    public ReceiptItems collectReceiptItems(List<PromotionApplyResult> promotionApplyResults, List<PurchaseRequest> normalRequests) {
         return purchaseService.processingReceiptItems(promotionApplyResults, normalRequests);
     }
 
@@ -100,5 +101,21 @@ public class StoreController {
             return questionForApplyPromotion(result);
         }
         return input;
+    }
+
+    public ReceiptPriceInfo processingReceiptPriceInfo(ReceiptItems receiptItems, boolean isContainsMembershipDiscount) {
+        return storeService.processingReceiptPriceInfo(receiptItems, isContainsMembershipDiscount);
+    }
+
+    public boolean isContainsMembershipDiscount() {
+        String input;
+        try {
+            input = storeInputView.inputAnswerAboutMembership();
+            //TODO: 입력 유효성 검사
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            isContainsMembershipDiscount();
+        }
+        return false;
     }
 }

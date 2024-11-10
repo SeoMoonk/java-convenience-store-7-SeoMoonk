@@ -15,4 +15,9 @@ public class StoreInputView {
         System.out.println(result.state().getFormattedMsg(result.product().getName(), result.conditionalQuantity()));
         return Console.readLine();
     }
+
+    public static String inputAnswerAboutMembership() {
+        System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
+        return Console.readLine();
+    }
 }

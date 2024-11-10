@@ -11,6 +11,10 @@ import product.service.ProductService;
 import promotion.entity.Promotion;
 import promotion.service.PromotionService;
 import store.dto.request.PurchaseRequest;
+import store.dto.response.FinalBonus;
+import store.dto.response.FinalPurchase;
+import store.dto.response.ReceiptItems;
+import store.dto.response.ReceiptPriceInfo;
 
 public class StoreService {
 
@@ -43,40 +47,37 @@ public class StoreService {
         }
     }
 
-//    public void purchase(List<PurchaseRequest> purchaseRequests) {
-//        List<PurchaseInfo> purchaseInfos = collectPurchaseInfos(purchaseRequests);
-//        for (PurchaseInfo info : purchaseInfos) {
-//            productService.purchase(info);
-//        }
-//        /*
-//        TODO :
-//         1. 일반 물품 처리
-//         2. 프로모션 물품 처리
-//         3. 총 몇 개가 결제되었고, 그 중 몇 개가 프로모션 제품인지 반환
-//         */
-//
-//        List<ProductInfo> productInfos = productService.getProductInfos();
-//        for (ProductInfo info : productInfos) {
-//            System.out.println(info.toString());
-//        }
-//    }
-//
-//    public void requestStorageStatusWithPromotions(List<PurchaseRequest> requests) {
-//        List<Promotion> promotions = promotionService.getActivePromotions();
-//        productService.checkStorageStatusWithPromotions(requests, promotions);
-//    }
-//
-//    public void getPromotionTargetProducts(List<PurchaseRequest> requests) {
-//        List<Promotion> promotions = promotionService.getActivePromotions();
-//
-//        for (PurchaseRequest request : requests) {
-//            productService.isPromotionTargetProduct(promotions, request);
-//        }
-//    }
-//
-//    public List<PurchaseInfo> collectPurchaseInfos(List<PurchaseRequest> purchaseRequests) {
-//        List<Promotion> activePromotions = promotionService.getActivePromotions();
-//        List<PurchaseInfo> purchaseInfos = productService.getPurchaseInfos(purchaseRequests, activePromotions);
-//        return purchaseInfos;
-//    }
+
+    public ReceiptPriceInfo processingReceiptPriceInfo(ReceiptItems items, boolean isContainsMembershipDiscount) {
+        List<FinalPurchase> purchases = items.purchases();
+        List<FinalBonus> bonuses = items.bonuses();
+        int totalAmount = calcTotalAmount(purchases, bonuses);
+        int promotionDiscount = calcPromotionDiscountAmount(bonuses);
+        int memberShipDiscount = 0;
+        if(isContainsMembershipDiscount) {
+            memberShipDiscount = promotionService.calcMembershipDiscountAmount(totalAmount, promotionDiscount);
+        }
+        int requiredAmount = totalAmount - promotionDiscount - memberShipDiscount;
+
+        return new ReceiptPriceInfo(totalAmount, promotionDiscount, memberShipDiscount, requiredAmount);
+    }
+
+    private int calcTotalAmount(List<FinalPurchase> purchases, List<FinalBonus> bonuses) {
+        int amount = 0;
+        for(FinalPurchase p : purchases) {
+            amount = amount + p.price() * p.quantity();
+        }
+        for(FinalBonus b : bonuses) {
+            amount = amount + b.discountAmount() * b.bonusQuantity();
+        }
+        return amount;
+    }
+
+    private int calcPromotionDiscountAmount(List<FinalBonus> bonuses) {
+        int amount = 0;
+        for(FinalBonus b : bonuses) {
+            amount = amount + b.discountAmount() * b.bonusQuantity();
+        }
+        return amount;
+    }
 }
