@@ -6,12 +6,14 @@ import product.entity.Product;
 import product.repository.ProductRepository;
 import product.repository.ProductRepositoryImpl;
 import product.service.ProductService;
+import promotion.dto.response.PromotionApplyResult;
 import promotion.repository.PromotionRepository;
 import promotion.repository.PromotionRepositoryImpl;
 import promotion.service.PromotionService;
 import store.controller.StoreController;
 import store.dto.request.PurchaseForm;
 import store.dto.request.PurchaseRequest;
+import store.dto.request.SeparatedPurchaseRequest;
 import store.service.PurchaseService;
 import store.service.StoreService;
 import store.view.StoreInputView;
@@ -35,8 +37,12 @@ public class Application {
         storeController.visitStore();
         List<PurchaseRequest> purchaseRequests = storeController.shoppingRequest();
         storeController.checkPurchaseRequests(purchaseRequests);
-        List<PurchaseForm> purchaseForms = storeController.processingPurchaseRequest(purchaseRequests);
+        SeparatedPurchaseRequest separatedRequests = storeController.getSeparatedPurchaseRequest(purchaseRequests);
+        List<PromotionApplyResult> promotionApplyResult = storeController.getPromotionApplyResult(
+                separatedRequests.promotionRequests());
+        List<PurchaseForm> purchaseForms = storeController.processingPurchaseRequest(promotionApplyResult,
+                separatedRequests.normalRequests());
         storeController.purchase(purchaseForms);
-//        storeController.getReceipt();
+        storeController.getReceipt();
     }
 }

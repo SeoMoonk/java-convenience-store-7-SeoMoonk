@@ -11,6 +11,9 @@ import promotion.service.PromotionService;
 import store.dto.request.PurchaseRequest;
 import store.dto.request.SeparatedPurchaseRequest;
 import store.dto.request.PurchaseForm;
+import store.dto.response.FinalBonus;
+import store.dto.response.FinalPurchase;
+import store.dto.response.ReceipItems;
 
 public class PurchaseService {
 
@@ -160,51 +163,51 @@ public class PurchaseService {
         productService.purchase(purchaseForms);
     }
 
-//    public Receipt processingPurChaseRequests(List<PromotionApplyResult> promotionResults,
-//                                           List<PurchaseRequest> normalRequests) {
-//        Receipt promotionReceipt = convertToFinalPurchaseForPromotion(promotionResults);
-//        Receipt normalReceipt = convertToFinalPurchaseForNormal(normalRequests);
-//
-//        return integrateReceipt(promotionReceipt, normalReceipt);
-//    }
+    public ReceipItems processingReceiptItems(List<PromotionApplyResult> promotionResults,
+                                         List<PurchaseRequest> normalRequests) {
+        ReceipItems promotionReceipItems = convertToReceiptItemByPromotion(promotionResults);
+        ReceipItems normalReceipItems = convertToReceiptItemByNormal(normalRequests);
 
-//    public Receipt convertToFinalPurchaseForPromotion(List<PromotionApplyResult> promotionResults) {
-//        List<FinalPurchase> finalPurchases = new ArrayList<>();
-//        List<FinalBonus> finalBonuses = new ArrayList<>();
-//        for (PromotionApplyResult result : promotionResults) {
-//            Product product = result.product();
-//            int quantity = result.promotionPurchase();
-//            int bonusQuantity = result.bonusQuantity();
-//            int price = product.getPrice();
-//            finalPurchases.add(
-//                    new FinalPurchase(product.getName(), quantity, calculateTotalPrice(price, quantity)));
-//            finalBonuses.add(
-//                    new FinalBonus(product.getName(), bonusQuantity, calculateTotalPrice(price, bonusQuantity)));
-//        }
-//        return new Receipt(finalPurchases, finalBonuses);
-//    }
-//
-//    public Receipt convertToFinalPurchaseForNormal(List<PurchaseRequest> normalRequests) {
-//        List<FinalPurchase> finalPurchases = new ArrayList<>();
-//        for (PurchaseRequest request : normalRequests) {
-//            String productName = request.productName();
-//            Product product = productService.getByNameAndPromotion(productName, null).get();
-//            int quantity = request.quantity();
-//            finalPurchases.add(new FinalPurchase(request.productName(), request.quantity(),
-//                    calculateTotalPrice(product.getPrice(), quantity)));
-//        }
-//        return new Receipt(finalPurchases, null);
-//    }
-//
-//    private int calculateTotalPrice(int price, int quantity) {
-//        return price * quantity;
-//    }
-//
-//    private Receipt integrateReceipt(Receipt promotionReceipt, Receipt normalReceipt) {
-//        List<FinalPurchase> integratedPurchases = new ArrayList<>();
-//        integratedPurchases.addAll(promotionReceipt.purchases());
-//        integratedPurchases.addAll(normalReceipt.purchases());
-//
-//        return new Receipt(integratedPurchases, promotionReceipt.bonuses());
-//    }
+        return integrateReceiptItems(promotionReceipItems, normalReceipItems);
+    }
+
+    public ReceipItems convertToReceiptItemByPromotion(List<PromotionApplyResult> promotionResults) {
+        List<FinalPurchase> finalPurchases = new ArrayList<>();
+        List<FinalBonus> finalBonuses = new ArrayList<>();
+        for (PromotionApplyResult result : promotionResults) {
+            Product product = result.product();
+            int quantity = result.promotionPurchase();
+            int bonusQuantity = result.bonusQuantity();
+            int price = product.getPrice();
+            finalPurchases.add(
+                    new FinalPurchase(product.getName(), quantity, calculateTotalPrice(price, quantity)));
+            finalBonuses.add(
+                    new FinalBonus(product.getName(), bonusQuantity, calculateTotalPrice(price, bonusQuantity)));
+        }
+        return new ReceipItems(finalPurchases, finalBonuses);
+    }
+
+    public ReceipItems convertToReceiptItemByNormal(List<PurchaseRequest> normalRequests) {
+        List<FinalPurchase> finalPurchases = new ArrayList<>();
+        for (PurchaseRequest request : normalRequests) {
+            String productName = request.productName();
+            Product product = productService.getByNameAndNotHasPromotion(productName);
+            int quantity = request.quantity();
+            finalPurchases.add(new FinalPurchase(request.productName(), request.quantity(),
+                    calculateTotalPrice(product.getPrice(), quantity)));
+        }
+        return new ReceipItems(finalPurchases, null);
+    }
+
+    private int calculateTotalPrice(int price, int quantity) {
+        return price * quantity;
+    }
+
+    private ReceipItems integrateReceiptItems(ReceipItems promotionReceipItems, ReceipItems normalReceipItems) {
+        List<FinalPurchase> integratedPurchases = new ArrayList<>();
+        integratedPurchases.addAll(promotionReceipItems.purchases());
+        integratedPurchases.addAll(normalReceipItems.purchases());
+
+        return new ReceipItems(integratedPurchases, promotionReceipItems.bonuses());
+    }
 }

@@ -5,14 +5,11 @@ import static global.utils.StringParser.parseShoppingList;
 import java.util.ArrayList;
 import java.util.List;
 import product.dto.response.ProductInfo;
-import promotion.constants.PromotionApplyState;
 import promotion.dto.response.PromotionApplyResult;
 import store.dto.request.PurchaseForm;
 import store.dto.request.PurchaseRequest;
 import store.dto.request.SeparatedPurchaseRequest;
-import store.dto.response.FinalBonus;
-import store.dto.response.FinalPurchase;
-import store.dto.response.Receipt;
+import store.dto.response.ReceipItems;
 import store.service.PurchaseService;
 import store.service.StoreService;
 import store.view.StoreInputView;
@@ -59,17 +56,21 @@ public class StoreController {
         }
     }
 
-    public List<PurchaseForm> processingPurchaseRequest(List<PurchaseRequest> purchaseRequests) {
-        SeparatedPurchaseRequest separatedRequest = purchaseService.separateRequest(purchaseRequests);
+    public SeparatedPurchaseRequest getSeparatedPurchaseRequest(List<PurchaseRequest> purchaseRequests) {
+        return purchaseService.separateRequest(purchaseRequests);
+    }
 
-        List<PromotionApplyResult> promotionApplyResults = modifyPromotionAppliesByQuestion(
-                purchaseService.promotionApplyRequest(separatedRequest.promotionRequests()));
+    public List<PromotionApplyResult> getPromotionApplyResult(List<PurchaseRequest> promotionPurchaseRequests) {
+        return modifyPromotionAppliesByQuestion(purchaseService.promotionApplyRequest(promotionPurchaseRequests));
+    }
 
-        //TODO: 나중에 메서드 분리해서 변수들 가져올 수 있게 만들고, 영수증 출력에 사용
-//        Receipt receipt = purchaseService.processingPurChaseRequests(promotionResults,
-//                separatedRequest.normalRequests());
+    public List<PurchaseForm> processingPurchaseRequest(List<PromotionApplyResult> promotionApplyResults,
+                                                        List<PurchaseRequest> normalRequests) {
+        return purchaseService.processingPurChaseRequests(promotionApplyResults, normalRequests);
+    }
 
-        return purchaseService.processingPurChaseRequests(promotionApplyResults, separatedRequest.normalRequests());
+    public ReceipItems getRecieptItems(List<PromotionApplyResult> promotionApplyResults, List<PurchaseRequest> normalRequests) {
+        return purchaseService.processingReceiptItems(promotionApplyResults, normalRequests);
     }
 
     public void purchase(List<PurchaseForm> purchaseForms) {
