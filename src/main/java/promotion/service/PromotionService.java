@@ -69,8 +69,8 @@ public class PromotionService {
         }
 
         if (canApplyAdditionalPromotion(info)) {
-            return new PromotionApplyResult(product, info.tempPurchaseQuantity(), info.tempBonusQuantity(),
-                    ADDITIONAL_PROMOTION_AVAILABLE, info.bonus());
+            return new PromotionApplyResult(product, info.tempPurchaseQuantity() + info.condition(),
+                    info.tempBonusQuantity(), ADDITIONAL_PROMOTION_AVAILABLE, info.bonus());
         }
 
         if (isNeedNormalPurchase(info)) {
@@ -90,7 +90,7 @@ public class PromotionService {
     }
 
     private boolean canApplyAdditionalPromotion(PromotionApplyInfo info) {
-        
+
         if (info.realApplyCount() >= info.requiredApplyCount() && info.needPurchase() == info.condition()) {
             return hasEnoughQuantity(info);
         }
@@ -102,7 +102,7 @@ public class PromotionService {
     }
 
     private boolean hasEnoughQuantity(PromotionApplyInfo info) {
-        if(info.stored() >= info.tempPurchaseQuantity() + info.bonus()) {
+        if (info.stored() >= info.tempPurchaseQuantity() + info.bonus()) {
             return true;
         }
         return false;
@@ -126,5 +126,9 @@ public class PromotionService {
 
         return new PromotionApplyInfo(stored, condition, bonus, applyCondition, requiredApplyCount, realApplyCount,
                 tempPurchaseQuantity, tempBonusQuantity, needPurchase);
+    }
+
+    public void vacateRepository() {
+        promotionRepository.removeAll();
     }
 }

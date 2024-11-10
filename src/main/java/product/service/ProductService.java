@@ -41,7 +41,6 @@ public class ProductService {
         int quantity = parseInt(dataSet.get(ProductPresetKeys.PRODUCT_QUANTITY_PRESET_KEY.getKey()));
         String promotionName = dataSet.get(ProductPresetKeys.PRODUCT_PROMOTION_NAME_PRESET_KEY.getKey());
         Promotion promotionByName = getPromotionByNameForProduct(promotionName);
-
         Product product = new Product(name, price, quantity, promotionByName);
         productRepository.save(product);
     }
@@ -103,7 +102,7 @@ public class ProductService {
         Optional<Product> maybeProduct = productRepository.findByNameAndPromotion(name, promotion);
 
         if (maybeProduct.isEmpty()) {
-            throw new IllegalArgumentException("제품 정보를 찾아올 수 없습니다");
+            throw new IllegalArgumentException("제품 정보를 찾아올 수 없습니다 : " + name);
         }
 
         return maybeProduct.get();
@@ -130,11 +129,15 @@ public class ProductService {
     }
 
     public void purchase(List<PurchaseForm> purchaseForms) {
-        for(PurchaseForm form : purchaseForms) {
+        for (PurchaseForm form : purchaseForms) {
             Product product = form.product();
             int quantity = form.quantity();
             product.subtractQuantity(quantity);
             productRepository.save(product);
         }
+    }
+
+    public void vacateRepository() {
+        productRepository.removeAll();
     }
 }

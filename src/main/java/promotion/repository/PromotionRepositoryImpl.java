@@ -29,4 +29,9 @@ public class PromotionRepositoryImpl implements PromotionRepository {
                 .filter(p -> !now.isAfter(p.getEndDate()))
                 .toList();
     }
+
+    @Override
+    public void removeAll() {
+        storage.clear();
+    }
 }

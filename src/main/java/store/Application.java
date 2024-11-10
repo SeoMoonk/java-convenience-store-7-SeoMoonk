@@ -1,6 +1,8 @@
 package store;
 
 import java.util.List;
+import product.dto.response.ProductInfo;
+import product.entity.Product;
 import product.repository.ProductRepository;
 import product.repository.ProductRepositoryImpl;
 import product.service.ProductService;
@@ -32,6 +34,7 @@ public class Application {
         storeController.setUp();
         storeController.visitStore();
         List<PurchaseRequest> purchaseRequests = storeController.shoppingRequest();
+        storeController.checkPurchaseRequests(purchaseRequests);
         List<PurchaseForm> purchaseForms = storeController.processingPurchaseRequest(purchaseRequests);
         storeController.purchase(purchaseForms);
 //        storeController.getReceipt();

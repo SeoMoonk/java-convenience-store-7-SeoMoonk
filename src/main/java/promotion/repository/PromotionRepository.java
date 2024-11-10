@@ -12,4 +12,6 @@ public interface PromotionRepository {
     Optional<Promotion> findByName(String name);
 
     List<Promotion> findAllByStartDateBeforeAndEndDateAfter(LocalDate now);
+
+    void removeAll();
 }

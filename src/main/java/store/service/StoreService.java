@@ -23,12 +23,24 @@ public class StoreService {
     }
 
     public void setUp() {
+        productService.vacateRepository();
+        promotionService.vacateRepository();
         promotionService.loadFromFilePath(PROMOTION_FILE_PATH);
         productService.loadFromFilePath(PRODUCT_FILE_PATH);
     }
 
     public List<ProductInfo> getProductInfos() {
         return productService.getProductInfos();
+    }
+
+    public void checkPurchaseRequests(List<PurchaseRequest> purchaseRequests) {
+        for (PurchaseRequest request : purchaseRequests) {
+            productService.getByName(request.productName());
+            int storedQuantity = productService.getAllQuantityByName(request.productName());
+            if (request.quantity() > storedQuantity) {
+                throw new IllegalArgumentException(ERROR_MSG_PREFIX + "재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
+            }
+        }
     }
 
 //    public void purchase(List<PurchaseRequest> purchaseRequests) {

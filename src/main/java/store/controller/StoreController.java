@@ -45,14 +45,18 @@ public class StoreController {
 
     public List<PurchaseRequest> shoppingRequest() {
         String requestInput = storeInputView.inputShoppingList();
-        List<PurchaseRequest> purchaseRequests = new ArrayList<>();
+        List<PurchaseRequest> purchaseRequests = purchaseRequests = parseShoppingList(requestInput);
+
+        return purchaseRequests;
+    }
+
+    public void checkPurchaseRequests(List<PurchaseRequest> purchaseRequests) {
         try {
-            purchaseRequests = parseShoppingList(requestInput);
+            storeService.checkPurchaseRequests(purchaseRequests);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            shoppingRequest();
+            checkPurchaseRequests(shoppingRequest());
         }
-        return purchaseRequests;
     }
 
     public List<PurchaseForm> processingPurchaseRequest(List<PurchaseRequest> purchaseRequests) {
@@ -70,9 +74,6 @@ public class StoreController {
 
     public void purchase(List<PurchaseForm> purchaseForms) {
         purchaseService.purchase(purchaseForms);
-
-        List<ProductInfo> productInfos = storeService.getProductInfos();
-        storeOutputView.printProductInfos(productInfos);
     }
 
     private List<PromotionApplyResult> modifyPromotionAppliesByQuestion(List<PromotionApplyResult> results) {

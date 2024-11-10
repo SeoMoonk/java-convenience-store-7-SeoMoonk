@@ -11,6 +11,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     private List<Product> storage = new ArrayList<>();
 
     @Override
+    public void removeAll() {
+        storage.clear();
+    }
+
+    @Override
     public void save(Product product) {
         storage.add(product);
     }
@@ -65,4 +70,5 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .filter(p -> Optional.ofNullable(p.getPromotion()).isEmpty())
                 .findFirst();
     }
+
 }
