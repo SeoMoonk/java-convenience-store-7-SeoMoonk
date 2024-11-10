@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import product.entity.Product;
-import promotion.constants.PromotionApplyState;
 import promotion.constants.PromotionPresetKeys;
+import promotion.dto.PromotionApplyInfo;
 import promotion.dto.response.PromotionApplyResult;
 import promotion.entity.Promotion;
 import promotion.repository.PromotionRepository;
@@ -60,33 +60,71 @@ public class PromotionService {
         return promotionRepository.findAllByStartDateBeforeAndEndDateAfter(today);
     }
 
-    //FIXME: 메서드 이름 변경 및 리팩토링 필요
     public PromotionApplyResult getPromotionApplyResult(Product product, int requiredQuantity) {
+        PromotionApplyInfo info = generatePromotionApplyInfo(product, requiredQuantity);
+
+        if (canApplyFullPromotion(info)) {
+            return new PromotionApplyResult(product, info.tempPurchaseQuantity(), info.tempPurchaseQuantity(),
+                    FULL_PROMOTION_APPLIED, 0);
+        }
+
+        if (canApplyAdditionalPromotion(info)) {
+            return new PromotionApplyResult(product, info.tempPurchaseQuantity(), info.tempBonusQuantity(),
+                    ADDITIONAL_PROMOTION_AVAILABLE, info.bonus());
+        }
+
+        if (isNeedNormalPurchase(info)) {
+            return new PromotionApplyResult(product, info.tempPurchaseQuantity(), info.tempBonusQuantity(),
+                    PARTIAL_PROMOTION_APPLIED, info.condition());
+        }
+
+        return new PromotionApplyResult(product, info.tempPurchaseQuantity(), info.tempBonusQuantity(),
+                PARTIAL_PROMOTION_APPLIED, info.needPurchase());
+    }
+
+    private boolean canApplyFullPromotion(PromotionApplyInfo info) {
+        if (info.realApplyCount() == info.requiredApplyCount() && info.needPurchase() == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean canApplyAdditionalPromotion(PromotionApplyInfo info) {
+        
+        if (info.realApplyCount() >= info.requiredApplyCount() && info.needPurchase() == info.condition()) {
+            return hasEnoughQuantity(info);
+        }
+
+        if (info.realApplyCount() == info.requiredApplyCount() - 1 && info.needPurchase() == info.condition()) {
+            return hasEnoughQuantity(info);
+        }
+        return false;
+    }
+
+    private boolean hasEnoughQuantity(PromotionApplyInfo info) {
+        if(info.stored() >= info.tempPurchaseQuantity() + info.bonus()) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isNeedNormalPurchase(PromotionApplyInfo info) {
+        return info.realApplyCount() == info.requiredApplyCount() - 1 && info.needPurchase() == info.condition();
+    }
+
+
+    public PromotionApplyInfo generatePromotionApplyInfo(Product product, int requiredQuantity) {
         int stored = product.getQuantity();
         int condition = product.getPromotion().getConditionQuantity();
         int bonus = product.getPromotion().getBonusQuantity();
         int applyCondition = condition + bonus;
-        int canApplyCount = stored / applyCondition;
         int requiredApplyCount = requiredQuantity / applyCondition;
-        int forPromotionQuantity = Math.min(requiredApplyCount, canApplyCount) * applyCondition;
-        int remainingQuantity = requiredQuantity - forPromotionQuantity;
-        int bonusQuantity = canApplyCount * bonus;
+        int realApplyCount = Math.min(product.getQuantity() / applyCondition, requiredQuantity / applyCondition);
+        int tempPurchaseQuantity = realApplyCount * applyCondition;
+        int tempBonusQuantity = realApplyCount * bonus;
+        int needPurchase = requiredQuantity - tempPurchaseQuantity;
 
-        if (remainingQuantity == 0) {
-            if (stored % applyCondition == condition) {
-                return new PromotionApplyResult(product, forPromotionQuantity, bonusQuantity,
-                        ADDITIONAL_PROMOTION_AVAILABLE, bonus);
-            }
-            return new PromotionApplyResult(product, forPromotionQuantity, bonusQuantity,
-                    FULL_PROMOTION_APPLIED, 0);
-        }
-
-        if (stored % applyCondition == condition) {
-            return new PromotionApplyResult(product, forPromotionQuantity, bonusQuantity,
-                    ADDITIONAL_PROMOTION_AVAILABLE, bonus);
-        }
-
-        return new PromotionApplyResult(product, forPromotionQuantity, bonusQuantity,
-                PARTIAL_PROMOTION_APPLIED, remainingQuantity);
+        return new PromotionApplyInfo(stored, condition, bonus, applyCondition, requiredApplyCount, realApplyCount,
+                tempPurchaseQuantity, tempBonusQuantity, needPurchase);
     }
 }
