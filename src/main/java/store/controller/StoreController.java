@@ -9,6 +9,9 @@ import promotion.constants.PromotionApplyState;
 import promotion.dto.response.PromotionApplyResult;
 import store.dto.request.PurchaseRequest;
 import store.dto.request.SeparatedPurchaseRequest;
+import store.dto.response.FinalBonus;
+import store.dto.response.FinalPurchase;
+import store.dto.response.Receipt;
 import store.service.PurchaseService;
 import store.service.StoreService;
 import store.view.StoreInputView;
@@ -51,34 +54,37 @@ public class StoreController {
         return purchaseRequests;
     }
 
-    public void separateAndTryPurchase(List<PurchaseRequest> purchaseRequests) {
-        SeparatedPurchaseRequest separatedPurchaseRequest = purchaseService.separateRequest(purchaseRequests);
+    public void getProcessedPurchaseRequests(List<PurchaseRequest> purchaseRequests) {
+        SeparatedPurchaseRequest separatedRequest = purchaseService.separateRequest(purchaseRequests);
+        List<PromotionApplyResult> promotionResults = modifyPromotionAppliesByQuestion(purchaseService
+                .promotionApplyRequest(separatedRequest.promotionRequests()));
 
-        List<PromotionApplyResult> results = purchaseService.promotionApplyRequest(
-                separatedPurchaseRequest.promotionRequests());
-        checkPromotionApplyResults(results);
-
+        Receipt receipt = purchaseService.processingPurChaseRequests(promotionResults,
+                separatedRequest.normalRequests());
     }
 
-    private void checkPromotionApplyResults(List<PromotionApplyResult> results) {
+    private List<PromotionApplyResult> modifyPromotionAppliesByQuestion(List<PromotionApplyResult> results) {
         List<PromotionApplyResult> modifiedResults = new ArrayList<>();
 
         for(PromotionApplyResult result : results) {
             if(!result.state().isSucceseState()) {
-                String input = storeInputView.inputAnswerAboutPromotion(result);
+                String input = questionForApplyPromotion(result);
                 modifiedResults.add(purchaseService.applyCustomerAnswer(input, result));
                 continue;
             }
             modifiedResults.add(result);
         }
-
-        for(PromotionApplyResult result : modifiedResults) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("이름 : " + result.product().getName() + "\n");
-            sb.append("총 차감 갯수 : " + result.promotionPurchase() + "\n");
-            sb.append("증정 수량 : " + result.bonusQuantity() + "\n");
-            System.out.println(sb);
-        };
+        return modifiedResults;
     }
 
+    private String questionForApplyPromotion(PromotionApplyResult result) {
+        String input;
+        try {
+            input = storeInputView.inputAnswerAboutPromotion(result);
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return questionForApplyPromotion(result);
+        }
+        return input;
+    }
 }

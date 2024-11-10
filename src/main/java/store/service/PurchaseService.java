@@ -10,6 +10,9 @@ import promotion.entity.Promotion;
 import promotion.service.PromotionService;
 import store.dto.request.PurchaseRequest;
 import store.dto.request.SeparatedPurchaseRequest;
+import store.dto.response.FinalBonus;
+import store.dto.response.FinalPurchase;
+import store.dto.response.Receipt;
 
 public class PurchaseService {
 
@@ -88,5 +91,53 @@ public class PurchaseService {
 
         //FIXME: 리팩토링
         throw new IllegalArgumentException("질문에 대한 응답은 (Y/N) 으로만 응답해야 합니다" + input);
+    }
+
+    public Receipt processingPurChaseRequests(List<PromotionApplyResult> promotionResults,
+                                           List<PurchaseRequest> normalRequests) {
+        Receipt promotionReceipt = convertToFinalPurchaseForPromotion(promotionResults);
+        Receipt normalReceipt = convertToFinalPurchaseForNormal(normalRequests);
+
+        return integrateReceipt(promotionReceipt, normalReceipt);
+    }
+
+    public Receipt convertToFinalPurchaseForPromotion(List<PromotionApplyResult> promotionResults) {
+        List<FinalPurchase> finalPurchases = new ArrayList<>();
+        List<FinalBonus> finalBonuses = new ArrayList<>();
+        for (PromotionApplyResult result : promotionResults) {
+            Product product = result.product();
+            int quantity = result.promotionPurchase();
+            int bonusQuantity = result.bonusQuantity();
+            int price = product.getPrice();
+            finalPurchases.add(
+                    new FinalPurchase(product.getName(), quantity, calculateTotalPrice(price, quantity)));
+            finalBonuses.add(
+                    new FinalBonus(product.getName(), bonusQuantity, calculateTotalPrice(price, bonusQuantity)));
+        }
+        return new Receipt(finalPurchases, finalBonuses);
+    }
+
+    public Receipt convertToFinalPurchaseForNormal(List<PurchaseRequest> normalRequests) {
+        List<FinalPurchase> finalPurchases = new ArrayList<>();
+        for (PurchaseRequest request : normalRequests) {
+            String productName = request.productName();
+            Product product = productService.getByNameAndPromotion(productName, null).get();
+            int quantity = request.quantity();
+            finalPurchases.add(new FinalPurchase(request.productName(), request.quantity(),
+                    calculateTotalPrice(product.getPrice(), quantity)));
+        }
+        return new Receipt(finalPurchases, null);
+    }
+
+    private int calculateTotalPrice(int price, int quantity) {
+        return price * quantity;
+    }
+
+    private Receipt integrateReceipt(Receipt promotionReceipt, Receipt normalReceipt) {
+        List<FinalPurchase> integratedPurchases = new ArrayList<>();
+        integratedPurchases.addAll(promotionReceipt.purchases());
+        integratedPurchases.addAll(normalReceipt.purchases());
+
+        return new Receipt(integratedPurchases, promotionReceipt.bonuses());
     }
 }

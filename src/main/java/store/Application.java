@@ -31,6 +31,6 @@ public class Application {
         storeController.setUp();
         storeController.visitStore();
         List<PurchaseRequest> purchaseRequests = storeController.shoppingRequest();
-        storeController.separateAndTryPurchase(purchaseRequests);
+        storeController.getProcessedPurchaseRequests(purchaseRequests);
     }
 }

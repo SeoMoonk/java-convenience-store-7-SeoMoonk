@@ -16,7 +16,6 @@ public record PromotionApplyResult(
     public PromotionApplyResult applyPromotion() {
         int finalPromotionPurchase = promotionPurchase + conditionalQuantity;
         int finalBonusQuantity = bonusQuantity + conditionalQuantity;
-
         return new PromotionApplyResult(product, finalPromotionPurchase, finalBonusQuantity,
                 FULL_PROMOTION_APPLIED, 0);
     }
@@ -26,15 +25,14 @@ public record PromotionApplyResult(
                 FULL_PROMOTION_APPLIED, 0);
     }
 
-    public PromotionApplyResult excludeNormalPurchase() {
-        return new PromotionApplyResult(product, promotionPurchase, bonusQuantity,
+    public PromotionApplyResult applyNormalPurchase() {
+        int finalPromotionPurchase = promotionPurchase + conditionalQuantity;
+        return new PromotionApplyResult(product, finalPromotionPurchase, bonusQuantity,
                 FULL_PROMOTION_APPLIED, 0);
     }
 
-    public PromotionApplyResult applyNormalPurchase() {
-        int finalPromotionPurchase = promotionPurchase + conditionalQuantity;
-
-        return new PromotionApplyResult(product, finalPromotionPurchase, bonusQuantity,
+    public PromotionApplyResult excludeNormalPurchase() {
+        return new PromotionApplyResult(product, promotionPurchase, bonusQuantity,
                 FULL_PROMOTION_APPLIED, 0);
     }
 }
