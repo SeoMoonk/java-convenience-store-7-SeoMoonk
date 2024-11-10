@@ -59,4 +59,8 @@ public class Product {
     public void subtractQuantity(int subtractQuantity) {
         this.quantity -= subtractQuantity;
     }
+
+    public boolean hasPromotion() {
+        return promotion != null;
+    }
 }

@@ -9,6 +9,7 @@ import promotion.repository.PromotionRepositoryImpl;
 import promotion.service.PromotionService;
 import store.controller.StoreController;
 import store.dto.request.PurchaseRequest;
+import store.service.PurchaseService;
 import store.service.StoreService;
 import store.view.StoreInputView;
 import store.view.StoreOutputView;
@@ -22,13 +23,14 @@ public class Application {
     private static final StoreInputView storeInputView = new StoreInputView();
     private static final StoreOutputView storeOutputView = new StoreOutputView();
     private static final StoreService storeService = new StoreService(promotionService, productService);
-    private static final StoreController storeController = new StoreController(storeInputView, storeOutputView, storeService);
+    private static final PurchaseService purchaseService = new PurchaseService(productService, promotionService);
+    private static final StoreController storeController = new StoreController(storeInputView, storeOutputView,
+            storeService, purchaseService);
 
     public static void main(String[] args) {
         storeController.setUp();
         storeController.visitStore();
         List<PurchaseRequest> purchaseRequests = storeController.shoppingRequest();
-        storeController.checkPurchaseRequest(purchaseRequests);
-        storeController.purchase(purchaseRequests);
+        storeController.separateAndTryPurchase(purchaseRequests);
     }
 }

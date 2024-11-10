@@ -6,7 +6,7 @@ import static promotion.constants.PromotionStatic.PROMOTION_FILE_PATH;
 
 import java.util.List;
 import product.dto.response.ProductInfo;
-import product.dto.response.PurchaseInfo;
+import product.entity.Product;
 import product.service.ProductService;
 import promotion.entity.Promotion;
 import promotion.service.PromotionService;
@@ -31,38 +31,40 @@ public class StoreService {
         return productService.getProductInfos();
     }
 
-    public void purchase(List<PurchaseRequest> purchaseRequests) {
-        List<PurchaseInfo> purchaseInfos = collectPurchaseInfos(purchaseRequests);
-        for (PurchaseInfo info : purchaseInfos) {
-            productService.purchase(info);
-        }
-        /*
-        TODO :
-         1. 일반 물품 처리
-         2. 프로모션 물품 처리
-         3. 총 몇 개가 결제되었고, 그 중 몇 개가 프로모션 제품인지 반환
-         */
-
-        List<ProductInfo> productInfos = productService.getProductInfos();
-        for (ProductInfo info : productInfos) {
-            System.out.println(info.toString());
-        }
-    }
-
-    public void checkStorageStatus(List<PurchaseRequest> purchaseRequests) {
-        for (PurchaseRequest request : purchaseRequests) {
-            productService.getAllByName(request.productName());
-            int storedQuantity = productService.getQuantityByName(request.productName());
-            if (storedQuantity < request.quantity()) {
-                throw new IllegalArgumentException(
-                        ERROR_MSG_PREFIX + "재고의 물량이 부족합니다. 다시 확인해 주세요 : " + request.productName());
-            }
-        }
-    }
-
-    public List<PurchaseInfo> collectPurchaseInfos(List<PurchaseRequest> purchaseRequests) {
-        List<Promotion> activePromotions = promotionService.getActivePromotions();
-        List<PurchaseInfo> purchaseInfos = productService.getPurchaseInfos(purchaseRequests, activePromotions);
-        return purchaseInfos;
-    }
+//    public void purchase(List<PurchaseRequest> purchaseRequests) {
+//        List<PurchaseInfo> purchaseInfos = collectPurchaseInfos(purchaseRequests);
+//        for (PurchaseInfo info : purchaseInfos) {
+//            productService.purchase(info);
+//        }
+//        /*
+//        TODO :
+//         1. 일반 물품 처리
+//         2. 프로모션 물품 처리
+//         3. 총 몇 개가 결제되었고, 그 중 몇 개가 프로모션 제품인지 반환
+//         */
+//
+//        List<ProductInfo> productInfos = productService.getProductInfos();
+//        for (ProductInfo info : productInfos) {
+//            System.out.println(info.toString());
+//        }
+//    }
+//
+//    public void requestStorageStatusWithPromotions(List<PurchaseRequest> requests) {
+//        List<Promotion> promotions = promotionService.getActivePromotions();
+//        productService.checkStorageStatusWithPromotions(requests, promotions);
+//    }
+//
+//    public void getPromotionTargetProducts(List<PurchaseRequest> requests) {
+//        List<Promotion> promotions = promotionService.getActivePromotions();
+//
+//        for (PurchaseRequest request : requests) {
+//            productService.isPromotionTargetProduct(promotions, request);
+//        }
+//    }
+//
+//    public List<PurchaseInfo> collectPurchaseInfos(List<PurchaseRequest> purchaseRequests) {
+//        List<Promotion> activePromotions = promotionService.getActivePromotions();
+//        List<PurchaseInfo> purchaseInfos = productService.getPurchaseInfos(purchaseRequests, activePromotions);
+//        return purchaseInfos;
+//    }
 }

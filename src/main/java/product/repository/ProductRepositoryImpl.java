@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import product.entity.Product;
+import promotion.entity.Promotion;
 
 public class ProductRepositoryImpl implements ProductRepository {
 
@@ -39,6 +40,14 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .filter(p -> name.equals(p.getName()))
                 .mapToInt(Product::getQuantity)
                 .sum();
+    }
+
+    @Override
+    public Optional<Product> findByNameAndPromotion(String name, Promotion promotion) {
+        return storage.stream()
+                .filter(p -> name.equals(p.getName()))
+                .filter(p -> promotion.equals(p.getPromotion()))
+                .findFirst();
     }
 
     @Override

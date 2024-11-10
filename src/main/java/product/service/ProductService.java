@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import product.constants.ProductPresetKeys;
 import product.dto.response.ProductInfo;
-import product.dto.response.PurchaseInfo;
 import product.entity.Product;
 import product.repository.ProductRepository;
 import promotion.entity.Promotion;
@@ -40,7 +39,7 @@ public class ProductService {
         int price = parseInt(dataSet.get(ProductPresetKeys.PRODUCT_PRICE_PRESET_KEY.getKey()));
         int quantity = parseInt(dataSet.get(ProductPresetKeys.PRODUCT_QUANTITY_PRESET_KEY.getKey()));
         String promotionName = dataSet.get(ProductPresetKeys.PRODUCT_PROMOTION_NAME_PRESET_KEY.getKey());
-        Promotion promotionByName = getPromotionByName(promotionName);
+        Promotion promotionByName = getPromotionByNameForProduct(promotionName);
 
         Product product = new Product(name, price, quantity, promotionByName);
         productRepository.save(product);
@@ -54,7 +53,7 @@ public class ProductService {
         return maybeProduct.get();
     }
 
-    private Promotion getPromotionByName(String promotionName) {
+    private Promotion getPromotionByNameForProduct(String promotionName) {
         Promotion promotion;
         try {
             promotion = promotionService.getByName(promotionName);
@@ -85,64 +84,33 @@ public class ProductService {
         return new ArrayList<>(products);
     }
 
-    public int getQuantityByName(String name) {
+    public int getAllQuantityByName(String name) {
         return productRepository.countAllByName(name);
     }
 
-//
-//    public void modifyQuantities(List<Product> targetProducts, int purchaseQuantity) {
-//        Product target = targetProducts.remove(0);
-//
-//        if (target.getQuantity() >= purchaseQuantity) {
-//            target.subtractQuantity(purchaseQuantity);
-//            return;
-//        }
-//
-//        while (purchaseQuantity != 0) {
-//            int currentQuantity = Math.min(target.getQuantity(), purchaseQuantity);
-//            target.subtractQuantity(currentQuantity);
-//            purchaseQuantity -= currentQuantity;
-//
-//            if (!targetProducts.isEmpty()) {
-//                target = targetProducts.remove(0);
-//            }
-//        }
-//    }
+    public boolean isPromotionTargetRequest(List<Promotion> promotions, PurchaseRequest request) {
+        for(Promotion promotion : promotions) {
+            Optional<Product> maybeProduct = getByNameAndPromotion(request.productName(), promotion);
 
-    public List<PurchaseInfo> getPurchaseInfos(List<PurchaseRequest> requests, List<Promotion> promotions) {
-        List<PurchaseInfo> purchaseInfos = new ArrayList<>();
-        for (PurchaseRequest request : requests) {
-            Optional<Product> maybeProduct = productRepository.findByNameAndHasPromotion(request.productName());
-            if (maybeProduct.isPresent() && promotions.contains(maybeProduct.get().getPromotion())) {
-                purchaseInfos.add(getPurchaseInfo(request, maybeProduct.get()));
-                continue;
+            if(maybeProduct.isPresent()) {
+                int minQuantity = promotion.getBonusQuantity() + promotion.getConditionQuantity();
+                return maybeProduct.get().getQuantity() >= minQuantity; //최소 한번 프로모션 적용이 되면 대상이 됨
             }
-            purchaseInfos.add(getPurchaseInfo(request, getByName(request.productName())));
         }
-        return purchaseInfos;
+        return false;
     }
 
-    private PurchaseInfo getPurchaseInfo(PurchaseRequest request, Product product) {
-        int remainingQuantity = product.getQuantity();
-        int purchaseQuantity = request.quantity();
-
-        if (remainingQuantity < purchaseQuantity) {
-            return new PurchaseInfo(product, purchaseQuantity - remainingQuantity, remainingQuantity);
-        }
-
-        return new PurchaseInfo(product, 0, purchaseQuantity);
+    public Optional<Product> getByNameAndPromotion(String name, Promotion promotion) {
+        return productRepository.findByNameAndPromotion(name,  promotion);
     }
 
-    public void purchase(PurchaseInfo info) {
-        if(info.bonusPurchaseQuantity() != 0) {
-            info.product().subtractQuantity(info.bonusPurchaseQuantity());
+    public Product getByNameAndHasPromotion(String name) {
+        Optional<Product> maybeProduct = productRepository.findByNameAndHasPromotion(name);
+
+        if(maybeProduct.isEmpty()) {
+            throw new IllegalArgumentException("상품 정보를 조회할 수 없습니다 : " + name);
         }
-        if(info.normalPurchaseQuantity() != 0 && info.product().getPromotion() != null) {
-            Product product = productRepository.findByNameAndNotHasPromotion(info.product().getName()).get();
-            product.subtractQuantity(info.normalPurchaseQuantity());
-        }
-        if(info.normalPurchaseQuantity() != 0 && info.product().getPromotion() == null) {
-            info.product().subtractQuantity(info.normalPurchaseQuantity());
-        }
+
+        return maybeProduct.get();
     }
 }
