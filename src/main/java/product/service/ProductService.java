@@ -15,6 +15,7 @@ import product.entity.Product;
 import product.repository.ProductRepository;
 import promotion.entity.Promotion;
 import promotion.service.PromotionService;
+import store.dto.request.PurchaseForm;
 import store.dto.request.PurchaseRequest;
 
 public class ProductService {
@@ -89,28 +90,51 @@ public class ProductService {
     }
 
     public boolean isPromotionTargetRequest(List<Promotion> promotions, PurchaseRequest request) {
-        for(Promotion promotion : promotions) {
-            Optional<Product> maybeProduct = getByNameAndPromotion(request.productName(), promotion);
+        for (Promotion promotion : promotions) {
+            Product maybeProduct = getByNameAndPromotion(request.productName(), promotion);
 
-            if(maybeProduct.isPresent()) {
-                int minQuantity = promotion.getBonusQuantity() + promotion.getConditionQuantity();
-                return maybeProduct.get().getQuantity() >= minQuantity; //최소 한번 프로모션 적용이 되면 대상이 됨
-            }
+            int minQuantity = promotion.getBonusQuantity() + promotion.getConditionQuantity();
+            return maybeProduct.getQuantity() >= minQuantity;
         }
         return false;
     }
 
-    public Optional<Product> getByNameAndPromotion(String name, Promotion promotion) {
-        return productRepository.findByNameAndPromotion(name,  promotion);
+    public Product getByNameAndPromotion(String name, Promotion promotion) {
+        Optional<Product> maybeProduct = productRepository.findByNameAndPromotion(name, promotion);
+
+        if (maybeProduct.isEmpty()) {
+            throw new IllegalArgumentException("제품 정보를 찾아올 수 없습니다");
+        }
+
+        return maybeProduct.get();
     }
 
     public Product getByNameAndHasPromotion(String name) {
         Optional<Product> maybeProduct = productRepository.findByNameAndHasPromotion(name);
 
-        if(maybeProduct.isEmpty()) {
+        if (maybeProduct.isEmpty()) {
             throw new IllegalArgumentException("상품 정보를 조회할 수 없습니다 : " + name);
         }
 
         return maybeProduct.get();
+    }
+
+    public Product getByNameAndNotHasPromotion(String name) {
+        Optional<Product> maybeProduct = productRepository.findByNameAndNotHasPromotion(name);
+
+        if (maybeProduct.isEmpty()) {
+            throw new IllegalArgumentException("상품 정보를 조회할 수 없습니다 : " + name);
+        }
+
+        return maybeProduct.get();
+    }
+
+    public void purchase(List<PurchaseForm> purchaseForms) {
+        for(PurchaseForm form : purchaseForms) {
+            Product product = form.product();
+            int quantity = form.quantity();
+            product.subtractQuantity(quantity);
+            productRepository.save(product);
+        }
     }
 }

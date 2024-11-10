@@ -8,6 +8,7 @@ import promotion.repository.PromotionRepository;
 import promotion.repository.PromotionRepositoryImpl;
 import promotion.service.PromotionService;
 import store.controller.StoreController;
+import store.dto.request.PurchaseForm;
 import store.dto.request.PurchaseRequest;
 import store.service.PurchaseService;
 import store.service.StoreService;
@@ -31,6 +32,8 @@ public class Application {
         storeController.setUp();
         storeController.visitStore();
         List<PurchaseRequest> purchaseRequests = storeController.shoppingRequest();
-        storeController.getProcessedPurchaseRequests(purchaseRequests);
+        List<PurchaseForm> purchaseForms = storeController.processingPurchaseRequest(purchaseRequests);
+        storeController.purchase(purchaseForms);
+//        storeController.getReceipt();
     }
 }
