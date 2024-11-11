@@ -41,4 +41,8 @@ public class Promotion {
     public LocalDate getEndDate() {
         return endDate;
     }
+
+    public int getApplyCondition() {
+        return conditionQuantity + bonusQuantity;
+    }
 }

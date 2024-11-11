@@ -6,6 +6,8 @@ import static global.utils.StringParser.parseInt;
 import static promotion.constants.PromotionApplyState.ADDITIONAL_PROMOTION_AVAILABLE;
 import static promotion.constants.PromotionApplyState.FULL_PROMOTION_APPLIED;
 import static promotion.constants.PromotionApplyState.PARTIAL_PROMOTION_APPLIED;
+import static promotion.constants.PromotionStatic.MAXIMUM_MEMBERSHIP_DISCOUNT_LIMIT;
+import static promotion.constants.PromotionStatic.MEMBERSHIP_DISCOUNT_RATE;
 import static store.constants.StoreErrorCode.NONE_EXISTENT_PROMOTION;
 
 import camp.nextstep.edu.missionutils.DateTimes;
@@ -61,25 +63,20 @@ public class PromotionService {
         return promotionRepository.findAllByStartDateBeforeAndEndDateAfter(today);
     }
 
-    //FIXME
     public PromotionApplyResult getPromotionApplyResult(Product product, int requiredQuantity) {
         PromotionApplyInfo info = generatePromotionApplyInfo(product, requiredQuantity);
-
         if (canApplyFullPromotion(info)) {
             return new PromotionApplyResult(product, info.tempPurchaseQuantity(), info.tempPurchaseQuantity(),
                     FULL_PROMOTION_APPLIED, 0);
         }
-
         if (canApplyAdditionalPromotion(info)) {
             return new PromotionApplyResult(product, info.tempPurchaseQuantity() + info.condition(),
                     info.tempBonusQuantity(), ADDITIONAL_PROMOTION_AVAILABLE, info.bonus());
         }
-
         if (isNeedNormalPurchase(info)) {
             return new PromotionApplyResult(product, info.tempPurchaseQuantity(), info.tempBonusQuantity(),
                     PARTIAL_PROMOTION_APPLIED, info.condition());
         }
-
         return new PromotionApplyResult(product, info.tempPurchaseQuantity(), info.tempBonusQuantity(),
                 PARTIAL_PROMOTION_APPLIED, info.needPurchase());
     }
@@ -111,20 +108,17 @@ public class PromotionService {
     private boolean isNeedNormalPurchase(PromotionApplyInfo info) {
         return info.realApplyCount() == info.requiredApplyCount() - 1 && info.needPurchase() == info.condition();
     }
-    
-    //FIXME: 리팩토링
+
     public PromotionApplyInfo generatePromotionApplyInfo(Product product, int requiredQuantity) {
-        int stored = product.getQuantity();
-        int condition = product.getPromotion().getConditionQuantity();
-        int bonus = product.getPromotion().getBonusQuantity();
-        int applyCondition = condition + bonus;
-        int requiredApplyCount = requiredQuantity / applyCondition;
+        Promotion promotion = product.getPromotion();
+        int applyCondition = promotion.getApplyCondition();
         int realApplyCount = Math.min(product.getQuantity() / applyCondition, requiredQuantity / applyCondition);
-        int tempPurchaseQuantity = realApplyCount * applyCondition;
-        int tempBonusQuantity = realApplyCount * bonus;
-        int needPurchase = requiredQuantity - tempPurchaseQuantity;
-        return new PromotionApplyInfo(stored, condition, bonus, applyCondition, requiredApplyCount, realApplyCount,
-                tempPurchaseQuantity, tempBonusQuantity, needPurchase);
+
+        return new PromotionApplyInfo(
+                product.getQuantity(), promotion.getConditionQuantity(), promotion.getBonusQuantity(),
+                applyCondition, requiredQuantity / applyCondition, realApplyCount, realApplyCount * applyCondition,
+                realApplyCount * promotion.getBonusQuantity(), requiredQuantity - (realApplyCount * applyCondition)
+        );
     }
 
     public void vacateRepository() {
@@ -133,9 +127,9 @@ public class PromotionService {
 
     public int calcMembershipDiscountAmount(int totalAmount, int promotionDiscountAmount) {
         int targetAmount = totalAmount - promotionDiscountAmount;
-        double result = targetAmount * 0.3;
-        if (result > 8000) {
-            return 8000;
+        double result = targetAmount * MEMBERSHIP_DISCOUNT_RATE;
+        if (result > MAXIMUM_MEMBERSHIP_DISCOUNT_LIMIT) {
+            return MAXIMUM_MEMBERSHIP_DISCOUNT_LIMIT;
         }
         return (int) Math.round(result);
     }
