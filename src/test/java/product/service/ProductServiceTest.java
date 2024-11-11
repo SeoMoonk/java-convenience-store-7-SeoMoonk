@@ -121,7 +121,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("결제를 수행하면, 수량이 차감된다")
+    @DisplayName("결제를 수행하면, 수량을 차감시키고 최신 재고를 유지한다")
     void t010() {
         List<PurchaseForm> purchaseForms = new ArrayList<>();
         Product beforeProduct = productService.getByNameAndNotHasPromotion("testProduct");
