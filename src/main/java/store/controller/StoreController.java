@@ -26,8 +26,8 @@ public class StoreController {
     private final StoreService storeService;
     private final PurchaseService purchaseService;
 
-    public StoreController(StoreInputView storeInputView, StoreOutputView storeOutputView, StoreService storeService,
-                           PurchaseService purchaseService) {
+    public StoreController(StoreInputView storeInputView, StoreOutputView storeOutputView,
+                           StoreService storeService, PurchaseService purchaseService) {
         this.storeInputView = storeInputView;
         this.storeOutputView = storeOutputView;
         this.storeService = storeService;
@@ -100,7 +100,7 @@ public class StoreController {
 
     private void checkPurchaseRequests(List<PurchaseRequest> purchaseRequests) {
         try {
-            storeService.checkPurchaseRequests(purchaseRequests);
+            purchaseService.checkPurchaseRequests(purchaseRequests);
         } catch (Exception e) {
             storeOutputView.printErrorMsg(e.getMessage());
             checkPurchaseRequests(shoppingRequest());
@@ -113,7 +113,7 @@ public class StoreController {
 
     private ReceiptItems collectReceiptItems(List<PromotionApplyResult> promotionApplyResults,
                                              List<PurchaseRequest> normalRequests) {
-        return purchaseService.processingReceiptItems(promotionApplyResults, normalRequests);
+        return storeService.processingReceiptItems(promotionApplyResults, normalRequests);
     }
 
     private void purchase(List<PurchaseForm> purchaseForms) {

@@ -10,17 +10,17 @@ public class StoreInputView {
         return Console.readLine();
     }
 
-    public static String inputAnswerAboutPromotion(PromotionApplyResult result) {
+    public String inputAnswerAboutPromotion(PromotionApplyResult result) {
         System.out.println(result.state().getFormattedMsg(result.product().getName(), result.conditionalQuantity()));
         return Console.readLine();
     }
 
-    public static String inputAnswerAboutMembership() {
+    public String inputAnswerAboutMembership() {
         System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
         return Console.readLine();
     }
 
-    public static String inputAnswerAboutAdditionalPurchase() {
+    public String inputAnswerAboutAdditionalPurchase() {
         System.out.println("감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)");
         return Console.readLine();
     }
