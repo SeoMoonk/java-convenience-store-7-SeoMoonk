@@ -1,12 +1,15 @@
 package store.view;
 
+import static store.constants.StoreInfoMsg.SUGGEST_ADDITIONAL_PURCHASE;
+
 import camp.nextstep.edu.missionutils.Console;
 import promotion.dto.response.PromotionApplyResult;
+import store.constants.StoreInfoMsg;
 
 public class StoreInputView {
 
     public String inputShoppingList() {
-        System.out.println("구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])");
+        System.out.println(StoreInfoMsg.INPUT_PRODUCT_NAME_AND_QUANTITY.getMsg());
         return Console.readLine();
     }
 
@@ -16,12 +19,12 @@ public class StoreInputView {
     }
 
     public String inputAnswerAboutMembership() {
-        System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
+        System.out.println(StoreInfoMsg.SUGGEST_MEMBERSHIP_DISCOUNT.getMsg());
         return Console.readLine();
     }
 
     public String inputAnswerAboutAdditionalPurchase() {
-        System.out.println("감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)");
+        System.out.println(SUGGEST_ADDITIONAL_PURCHASE);
         return Console.readLine();
     }
 }

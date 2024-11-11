@@ -93,29 +93,20 @@ public class StoreService {
     }
 
     private int calcTotalQuantity(List<FinalPurchase> purchases) {
-        int amount = 0;
-        for (FinalPurchase purchase : purchases) {
-            amount += purchase.quantity();
-        }
-        return amount;
+        return purchases.stream()
+                .mapToInt(FinalPurchase::quantity)
+                .sum();
     }
 
     private int calcTotalAmount(List<FinalPurchase> purchases, List<FinalBonus> bonuses) {
-        int amount = 0;
-        for (FinalPurchase p : purchases) {
-            amount = amount + p.price();
-        }
-        for (FinalBonus b : bonuses) {
-            amount = amount + b.discountAmount();
-        }
-        return amount;
+        int purchaseAmount = purchases.stream().mapToInt(FinalPurchase::price).sum();
+        int discountAmount = bonuses.stream().mapToInt(FinalBonus::discountAmount).sum();
+        return purchaseAmount + discountAmount;
     }
 
     private int calcPromotionDiscountAmount(List<FinalBonus> bonuses) {
-        int amount = 0;
-        for (FinalBonus b : bonuses) {
-            amount = amount + b.discountAmount();
-        }
-        return amount;
+        return bonuses.stream()
+                .mapToInt(FinalBonus::discountAmount)
+                .sum();
     }
 }
