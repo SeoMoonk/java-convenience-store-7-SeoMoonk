@@ -6,6 +6,7 @@ import static global.utils.StringParser.parseInt;
 import static promotion.constants.PromotionApplyState.ADDITIONAL_PROMOTION_AVAILABLE;
 import static promotion.constants.PromotionApplyState.FULL_PROMOTION_APPLIED;
 import static promotion.constants.PromotionApplyState.PARTIAL_PROMOTION_APPLIED;
+import static store.constants.StoreErrorCode.NONE_EXISTENT_PROMOTION;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import global.constants.FileType;
@@ -50,7 +51,7 @@ public class PromotionService {
     public Promotion getByName(String name) {
         Optional<Promotion> maybePromotion = promotionRepository.findByName(name);
         if (maybePromotion.isEmpty()) {
-            throw new IllegalArgumentException("해당 이름을 가진 프로모션을 찾을 수 없습니다 : " + name);
+            throw new IllegalArgumentException(NONE_EXISTENT_PROMOTION.getMsgWithPrefix());
         }
         return maybePromotion.get();
     }
@@ -60,6 +61,7 @@ public class PromotionService {
         return promotionRepository.findAllByStartDateBeforeAndEndDateAfter(today);
     }
 
+    //FIXME
     public PromotionApplyResult getPromotionApplyResult(Product product, int requiredQuantity) {
         PromotionApplyInfo info = generatePromotionApplyInfo(product, requiredQuantity);
 
@@ -90,11 +92,9 @@ public class PromotionService {
     }
 
     private boolean canApplyAdditionalPromotion(PromotionApplyInfo info) {
-
         if (info.realApplyCount() >= info.requiredApplyCount() && info.needPurchase() == info.condition()) {
             return hasEnoughQuantity(info);
         }
-
         if (info.realApplyCount() == info.requiredApplyCount() - 1 && info.needPurchase() == info.condition()) {
             return hasEnoughQuantity(info);
         }
@@ -111,8 +111,8 @@ public class PromotionService {
     private boolean isNeedNormalPurchase(PromotionApplyInfo info) {
         return info.realApplyCount() == info.requiredApplyCount() - 1 && info.needPurchase() == info.condition();
     }
-
-
+    
+    //FIXME: 리팩토링
     public PromotionApplyInfo generatePromotionApplyInfo(Product product, int requiredQuantity) {
         int stored = product.getQuantity();
         int condition = product.getPromotion().getConditionQuantity();
@@ -123,7 +123,6 @@ public class PromotionService {
         int tempPurchaseQuantity = realApplyCount * applyCondition;
         int tempBonusQuantity = realApplyCount * bonus;
         int needPurchase = requiredQuantity - tempPurchaseQuantity;
-
         return new PromotionApplyInfo(stored, condition, bonus, applyCondition, requiredApplyCount, realApplyCount,
                 tempPurchaseQuantity, tempBonusQuantity, needPurchase);
     }
@@ -135,11 +134,9 @@ public class PromotionService {
     public int calcMembershipDiscountAmount(int totalAmount, int promotionDiscountAmount) {
         int targetAmount = totalAmount - promotionDiscountAmount;
         double result = targetAmount * 0.3;
-
-        if(result > 8000) {
+        if (result > 8000) {
             return 8000;
         }
-
         return (int) Math.round(result);
     }
 }

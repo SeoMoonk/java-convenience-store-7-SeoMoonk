@@ -9,11 +9,11 @@ public enum FileType {
     PRODUCT, PROMOTION;
 
     public List<String> getPresetKeys(FileType fileType) {
-        if(fileType.equals(PRODUCT)) {
+        if (fileType.equals(PRODUCT)) {
             return ProductPresetKeys.getKeys();
         }
 
-        if(fileType.equals(PROMOTION)) {
+        if (fileType.equals(PROMOTION)) {
             return PromotionPresetKeys.getKeys();
         }
 

@@ -1,7 +1,6 @@
 package store.utils;
 
 import static global.utils.StringParser.parseInt;
-import static store.constants.StoreStatic.ITEMS_SEPARATOR;
 import static store.constants.StoreStatic.ITEM_NAME_QUANTITY_SEPARATOR;
 import static store.constants.StoreStatic.ITEM_PREFIX;
 import static store.constants.StoreStatic.ITEM_SUFFIX;
@@ -9,7 +8,6 @@ import static store.constants.StoreStatic.NEGATIVE_ANSWER;
 import static store.constants.StoreStatic.POSITIVE_ANSWER;
 
 import store.constants.StoreErrorCode;
-import store.view.StoreOutputView;
 
 public class StoreValidator {
 

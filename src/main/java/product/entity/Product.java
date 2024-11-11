@@ -1,5 +1,9 @@
 package product.entity;
 
+import static product.constants.ProductStatic.EMPTY_STATE;
+import static product.constants.ProductStatic.MONETARY_UNIT;
+import static product.constants.ProductStatic.PRODUCT_UNIT;
+
 import promotion.entity.Promotion;
 
 public class Product {
@@ -37,20 +41,19 @@ public class Product {
 
     public String getFormattedPrice() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%,d", price));
-        sb.append("원");
+        sb.append(String.format("%,d", price)).append(MONETARY_UNIT);
         return sb.toString();
     }
 
     public String getFormattedQuantity() {
-        if(this.quantity == 0) {
-            return "재고 없음";
+        if (this.quantity == 0) {
+            return EMPTY_STATE;
         }
-        return String.valueOf(quantity) + "개";
+        return quantity + PRODUCT_UNIT;
     }
 
     public String getFormattedPromotionName() {
-        if(promotion == null) {
+        if (promotion == null) {
             return "";
         }
         return promotion.getName();
@@ -58,9 +61,5 @@ public class Product {
 
     public void subtractQuantity(int subtractQuantity) {
         this.quantity -= subtractQuantity;
-    }
-
-    public boolean hasPromotion() {
-        return promotion != null;
     }
 }

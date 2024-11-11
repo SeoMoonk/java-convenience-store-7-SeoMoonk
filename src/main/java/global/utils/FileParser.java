@@ -1,15 +1,12 @@
 package global.utils;
 
-import static global.constants.GlobalStatic.ERROR_MSG_PREFIX;
 import static global.constants.GlobalStatic.FILE_DATA_SEPARATOR;
 
 import global.constants.FileType;
 import global.constants.GlobalErrorCode;
 import global.utils.Validator.FileValidator;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

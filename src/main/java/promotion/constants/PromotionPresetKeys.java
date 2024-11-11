@@ -2,7 +2,6 @@ package promotion.constants;
 
 import java.util.ArrayList;
 import java.util.List;
-import product.constants.ProductPresetKeys;
 
 public enum PromotionPresetKeys {
 

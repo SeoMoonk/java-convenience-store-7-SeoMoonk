@@ -1,9 +1,5 @@
 package global.utils;
 
-import static store.constants.StoreStatic.ITEMS_SEPARATOR;
-import static store.constants.StoreStatic.ITEM_PREFIX;
-import static store.constants.StoreStatic.ITEM_SUFFIX;
-
 import global.constants.FileType;
 import global.constants.GlobalErrorCode;
 import java.util.List;

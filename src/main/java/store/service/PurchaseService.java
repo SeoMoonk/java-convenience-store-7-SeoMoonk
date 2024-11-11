@@ -10,11 +10,11 @@ import promotion.constants.PromotionApplyState;
 import promotion.dto.response.PromotionApplyResult;
 import promotion.entity.Promotion;
 import promotion.service.PromotionService;
+import store.dto.request.PurchaseForm;
 import store.dto.request.PurchaseRequest;
 import store.dto.request.SeparatedPurchaseRequest;
-import store.dto.request.PurchaseForm;
-import store.dto.response.FinalBonus;
-import store.dto.response.FinalPurchase;
+import store.dto.FinalBonus;
+import store.dto.FinalPurchase;
 import store.dto.response.ReceiptItems;
 
 public class PurchaseService {

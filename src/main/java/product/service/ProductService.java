@@ -2,6 +2,7 @@ package product.service;
 
 import static global.constants.GlobalStatic.ERROR_MSG_PREFIX;
 import static global.utils.StringParser.parseInt;
+import static store.constants.StoreErrorCode.NONE_EXISTENT_PRODUCT;
 
 import global.constants.FileType;
 import global.utils.FileParser;
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import product.constants.ProductPresetKeys;
-import product.dto.response.ProductInfo;
+import product.dto.ProductInfo;
 import product.entity.Product;
 import product.repository.ProductRepository;
 import promotion.entity.Promotion;
@@ -68,7 +69,7 @@ public class ProductService {
     public Product getByName(String name) {
         Optional<Product> maybeProduct = productRepository.findByName(name);
         if (maybeProduct.isEmpty()) {
-            throw new IllegalArgumentException(ERROR_MSG_PREFIX + "해당 이름을 가진 제품을 찾을 수 없습니다 : " + name);
+            throw new IllegalArgumentException(NONE_EXISTENT_PRODUCT.getMsgWithPrefix());
         }
         return maybeProduct.get();
     }
@@ -111,7 +112,6 @@ public class ProductService {
     public boolean isPromotionTargetRequest(List<Promotion> promotions, PurchaseRequest request) {
         for (Promotion promotion : promotions) {
             Optional<Product> maybeProduct = getByNameAndPromotion(request.productName(), promotion);
-
             if (maybeProduct.isPresent()) {
                 int minQuantity = promotion.getBonusQuantity() + promotion.getConditionQuantity();
                 return maybeProduct.get().getQuantity() >= minQuantity;
@@ -126,21 +126,17 @@ public class ProductService {
 
     public Product getByNameAndHasPromotion(String name) {
         Optional<Product> maybeProduct = productRepository.findByNameAndHasPromotion(name);
-
         if (maybeProduct.isEmpty()) {
-            throw new IllegalArgumentException("상품 정보를 조회할 수 없습니다 : " + name);
+            throw new IllegalArgumentException(NONE_EXISTENT_PRODUCT.getMsgWithPrefix());
         }
-
         return maybeProduct.get();
     }
 
     public Product getByNameAndNotHasPromotion(String name) {
         Optional<Product> maybeProduct = productRepository.findByNameAndNotHasPromotion(name);
-
         if (maybeProduct.isEmpty()) {
-            throw new IllegalArgumentException("상품 정보를 조회할 수 없습니다 : " + name);
+            throw new IllegalArgumentException(NONE_EXISTENT_PRODUCT.getMsgWithPrefix());
         }
-
         return maybeProduct.get();
     }
 

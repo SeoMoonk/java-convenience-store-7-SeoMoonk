@@ -1,4 +1,4 @@
-package product.dto.response;
+package product.dto;
 
 import product.entity.Product;
 

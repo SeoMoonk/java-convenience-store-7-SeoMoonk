@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum ProductPresetKeys {
-
     PRODUCT_NAME_PRESET_KEY("name"),
     PRODUCT_PRICE_PRESET_KEY("price"),
     PRODUCT_QUANTITY_PRESET_KEY("quantity"),

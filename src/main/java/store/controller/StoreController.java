@@ -4,15 +4,14 @@ import static global.utils.StringParser.parseShoppingList;
 import static store.constants.StoreStatic.POSITIVE_ANSWER;
 import static store.utils.StoreValidator.validateAnswerForAdditionalQuestion;
 
-import camp.nextstep.edu.missionutils.Console;
 import java.util.ArrayList;
 import java.util.List;
-import product.dto.response.ProductInfo;
+import product.dto.ProductInfo;
 import promotion.dto.response.PromotionApplyResult;
+import store.dto.request.ProcessedPurchaseRequest;
 import store.dto.request.PurchaseForm;
 import store.dto.request.PurchaseRequest;
 import store.dto.request.SeparatedPurchaseRequest;
-import store.dto.request.ProcessedPurchaseRequest;
 import store.dto.response.ReceiptItems;
 import store.dto.response.ReceiptPriceInfo;
 import store.service.PurchaseService;
@@ -55,12 +54,6 @@ public class StoreController {
         return new ProcessedPurchaseRequest(separatedRequests.normalRequests(), applyPromotions);
     }
 
-    private void visitStore() {
-        storeOutputView.printStartMsg();
-        List<ProductInfo> productInfos = storeService.getProductInfos();
-        storeOutputView.printProductInfos(productInfos);
-    }
-
     private void confirmOrder(ProcessedPurchaseRequest processedPurchaseRequest) {
         List<PurchaseForm> purchaseForms = confirmFinalPurchaseForm(
                 processedPurchaseRequest.promotionAppliedRequests(), processedPurchaseRequest.normalRequests());
@@ -73,6 +66,12 @@ public class StoreController {
         ReceiptPriceInfo receiptPriceInfo = processingReceiptPriceInfo(receiptItems,
                 isContainsMembershipDiscount());
         printReceipt(receiptItems, receiptPriceInfo);
+    }
+
+    private void visitStore() {
+        storeOutputView.printStartMsg();
+        List<ProductInfo> productInfos = storeService.getProductInfos();
+        storeOutputView.printProductInfos(productInfos);
     }
 
     private List<PurchaseForm> confirmFinalPurchaseForm(List<PromotionApplyResult> promotionPurchases,
@@ -92,8 +91,7 @@ public class StoreController {
     private List<PurchaseRequest> shoppingRequest() {
         try {
             String requestInput = storeInputView.inputShoppingList();
-            List<PurchaseRequest> purchaseRequests = parseShoppingList(requestInput);
-            return purchaseRequests;
+            return parseShoppingList(requestInput);
         } catch (Exception e) {
             storeOutputView.printErrorMsg(e.getMessage());
             return shoppingRequest();
@@ -104,8 +102,8 @@ public class StoreController {
         try {
             storeService.checkPurchaseRequests(purchaseRequests);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            checkPurchaseRequests(shoppingRequest());       //FIXME: 예외 처리
+            storeOutputView.printErrorMsg(e.getMessage());
+            checkPurchaseRequests(shoppingRequest());
         }
     }
 
@@ -140,7 +138,7 @@ public class StoreController {
             input = storeInputView.inputAnswerAboutPromotion(result);
             validateAnswerForAdditionalQuestion(input);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            storeOutputView.printErrorMsg(e.getMessage());
             return questionForApplyPromotion(result);
         }
         return input.equals(POSITIVE_ANSWER);
@@ -152,7 +150,7 @@ public class StoreController {
             input = storeInputView.inputAnswerAboutAdditionalPurchase();
             validateAnswerForAdditionalQuestion(input);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            storeOutputView.printErrorMsg(e.getMessage());
             return questionForAdditionalPurchase();
         }
         return input.equals(POSITIVE_ANSWER);
@@ -169,7 +167,7 @@ public class StoreController {
             input = storeInputView.inputAnswerAboutMembership();
             validateAnswerForAdditionalQuestion(input);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            storeOutputView.printErrorMsg(e.getMessage());
             return isContainsMembershipDiscount();
         }
         return input.equals(POSITIVE_ANSWER);

@@ -1,21 +1,12 @@
 package store;
 
-import java.util.List;
-import product.dto.response.ProductInfo;
-import product.entity.Product;
 import product.repository.ProductRepository;
 import product.repository.ProductRepositoryImpl;
 import product.service.ProductService;
-import promotion.dto.response.PromotionApplyResult;
 import promotion.repository.PromotionRepository;
 import promotion.repository.PromotionRepositoryImpl;
 import promotion.service.PromotionService;
 import store.controller.StoreController;
-import store.dto.request.PurchaseForm;
-import store.dto.request.PurchaseRequest;
-import store.dto.request.SeparatedPurchaseRequest;
-import store.dto.response.ReceiptItems;
-import store.dto.response.ReceiptPriceInfo;
 import store.service.PurchaseService;
 import store.service.StoreService;
 import store.view.StoreInputView;

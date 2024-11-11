@@ -1,9 +1,9 @@
 package store.view;
 
 import java.util.List;
-import product.dto.response.ProductInfo;
-import store.dto.response.FinalBonus;
-import store.dto.response.FinalPurchase;
+import product.dto.ProductInfo;
+import store.dto.FinalBonus;
+import store.dto.FinalPurchase;
 import store.dto.response.ReceiptItems;
 import store.dto.response.ReceiptPriceInfo;
 

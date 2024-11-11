@@ -1,19 +1,16 @@
 package store.service;
 
-import static global.constants.GlobalStatic.ERROR_MSG_PREFIX;
 import static product.constants.ProductStatic.PRODUCT_FILE_PATH;
 import static promotion.constants.PromotionStatic.PROMOTION_FILE_PATH;
 import static store.constants.StoreErrorCode.CANNOT_REQUEST_OVER_STORED_QUANTITY;
 
 import java.util.List;
-import product.dto.response.ProductInfo;
-import product.entity.Product;
+import product.dto.ProductInfo;
 import product.service.ProductService;
-import promotion.entity.Promotion;
 import promotion.service.PromotionService;
 import store.dto.request.PurchaseRequest;
-import store.dto.response.FinalBonus;
-import store.dto.response.FinalPurchase;
+import store.dto.FinalBonus;
+import store.dto.FinalPurchase;
 import store.dto.response.ReceiptItems;
 import store.dto.response.ReceiptPriceInfo;
 

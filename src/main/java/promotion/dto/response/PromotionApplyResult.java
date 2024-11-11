@@ -7,10 +7,10 @@ import promotion.constants.PromotionApplyState;
 
 public record PromotionApplyResult(
         Product product,
-        int promotionPurchase,      //프로모션 재고에서 몇개를 차감해야 되는지
-        int bonusQuantity,          //이 결제로 인해 몇 개가 증정으로 처리되는지
-        PromotionApplyState state,  //상태 코드
-        int conditionalQuantity     //상태에 따른 조건을 위한 갯수
+        int promotionPurchase,
+        int bonusQuantity,
+        PromotionApplyState state,
+        int conditionalQuantity
 ) {
 
     public PromotionApplyResult applyPromotion() {

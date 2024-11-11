@@ -1,7 +1,6 @@
 package store.view;
 
 import camp.nextstep.edu.missionutils.Console;
-import promotion.constants.PromotionApplyState;
 import promotion.dto.response.PromotionApplyResult;
 
 public class StoreInputView {

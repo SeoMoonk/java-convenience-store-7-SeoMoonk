@@ -1,4 +1,4 @@
-package store.dto.response;
+package store.dto;
 
 public record FinalBonus(
         String productName,
