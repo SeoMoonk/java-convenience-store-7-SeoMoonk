@@ -90,7 +90,7 @@ public class PurchaseService {
         return purchaseForms;
     }
 
-    public List<PurchaseForm> getPurchaseFormByPromotion(List<PromotionApplyResult> promotionResults) {
+    private List<PurchaseForm> getPurchaseFormByPromotion(List<PromotionApplyResult> promotionResults) {
         List<PurchaseForm> purchaseForms = new ArrayList<>();
         for (PromotionApplyResult result : promotionResults) {
             Product targetProduct = result.product();
@@ -113,7 +113,7 @@ public class PurchaseService {
         return purchaseForms;
     }
 
-    public List<PurchaseForm> getPurchaseFormByNormal(List<PurchaseRequest> normalRequests) {
+    private List<PurchaseForm> getPurchaseFormByNormal(List<PurchaseRequest> normalRequests) {
         List<PurchaseForm> purchaseForms = new ArrayList<>();
         for (PurchaseRequest request : normalRequests) {
             Product normalProduct = productService.getByNameAndNotHasPromotion(request.productName());
