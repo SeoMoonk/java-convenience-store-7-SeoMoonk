@@ -36,19 +36,6 @@ public class Application {
 
     public static void main(String[] args) {
         storeController.setUp();
-        storeController.visitStore();
-        List<PurchaseRequest> purchaseRequests = storeController.shoppingRequest();
-        storeController.checkPurchaseRequests(purchaseRequests);
-        SeparatedPurchaseRequest separatedRequests = storeController.getSeparatedPurchaseRequest(purchaseRequests);
-        List<PromotionApplyResult> promotionApplyResult = storeController.getPromotionApplyResult(
-                separatedRequests.promotionRequests());
-        List<PurchaseForm> purchaseForms = storeController.processingPurchaseRequest(promotionApplyResult,
-                separatedRequests.normalRequests());
-        storeController.purchase(purchaseForms);
-        ReceiptItems receiptItems = storeController.collectReceiptItems(promotionApplyResult,
-                separatedRequests.normalRequests());
-        ReceiptPriceInfo receiptPriceInfo = storeController.processingReceiptPriceInfo(receiptItems,
-                storeController.isContainsMembershipDiscount());
-        storeController.printReceipt(receiptItems, receiptPriceInfo);
+        storeController.shopping();
     }
 }
