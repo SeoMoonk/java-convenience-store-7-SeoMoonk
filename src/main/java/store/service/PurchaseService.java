@@ -1,5 +1,7 @@
 package store.service;
 
+import static store.constants.StoreErrorCode.CANNOT_ANSWER_PROCESS;
+
 import java.util.ArrayList;
 import java.util.List;
 import product.entity.Product;
@@ -54,7 +56,6 @@ public class PurchaseService {
     }
 
     public PromotionApplyResult applyCustomerAnswer(boolean isPositiveAnswer, PromotionApplyResult result) {
-
         if (result.state() == PromotionApplyState.ADDITIONAL_PROMOTION_AVAILABLE) {
             return fixForAdditionalCondition(isPositiveAnswer, result);
         }
@@ -63,7 +64,7 @@ public class PurchaseService {
             return fixForPartialCondition(isPositiveAnswer, result);
         }
 
-        throw new IllegalArgumentException("프로모션 요청이 잘못되었습니다");
+        throw new IllegalArgumentException(CANNOT_ANSWER_PROCESS.getMsgWithPrefix());
     }
 
     private PromotionApplyResult fixForAdditionalCondition(boolean isPositiveAnswer, PromotionApplyResult result) {

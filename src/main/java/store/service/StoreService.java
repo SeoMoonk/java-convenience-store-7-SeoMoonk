@@ -3,6 +3,7 @@ package store.service;
 import static global.constants.GlobalStatic.ERROR_MSG_PREFIX;
 import static product.constants.ProductStatic.PRODUCT_FILE_PATH;
 import static promotion.constants.PromotionStatic.PROMOTION_FILE_PATH;
+import static store.constants.StoreErrorCode.CANNOT_REQUEST_OVER_STORED_QUANTITY;
 
 import java.util.List;
 import product.dto.response.ProductInfo;
@@ -42,11 +43,10 @@ public class StoreService {
             productService.getByName(request.productName());
             int storedQuantity = productService.getAllQuantityByName(request.productName());
             if (request.quantity() > storedQuantity) {
-                throw new IllegalArgumentException(ERROR_MSG_PREFIX + "재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
+                throw new IllegalArgumentException(CANNOT_REQUEST_OVER_STORED_QUANTITY.getMsgWithPrefix());
             }
         }
     }
-
 
     public ReceiptPriceInfo processingReceiptPriceInfo(ReceiptItems items, boolean isContainsMembershipDiscount) {
         List<FinalPurchase> purchases = items.purchases();
@@ -55,17 +55,16 @@ public class StoreService {
         int promotionDiscount = calcPromotionDiscountAmount(bonuses);
         int totalAmount = calcTotalAmount(purchases, bonuses) - promotionDiscount;
         int memberShipDiscount = 0;
-        if(isContainsMembershipDiscount) {
+        if (isContainsMembershipDiscount) {
             memberShipDiscount = promotionService.calcMembershipDiscountAmount(totalAmount, promotionDiscount);
         }
         int requiredAmount = totalAmount - promotionDiscount - memberShipDiscount;
-
         return new ReceiptPriceInfo(totalQuantity, totalAmount, promotionDiscount, memberShipDiscount, requiredAmount);
     }
 
     private int calcTotalQuantity(List<FinalPurchase> purchases) {
         int amount = 0;
-        for(FinalPurchase purchase : purchases) {
+        for (FinalPurchase purchase : purchases) {
             amount += purchase.quantity();
         }
         return amount;
@@ -73,10 +72,10 @@ public class StoreService {
 
     private int calcTotalAmount(List<FinalPurchase> purchases, List<FinalBonus> bonuses) {
         int amount = 0;
-        for(FinalPurchase p : purchases) {
+        for (FinalPurchase p : purchases) {
             amount = amount + p.price();
         }
-        for(FinalBonus b : bonuses) {
+        for (FinalBonus b : bonuses) {
             amount = amount + b.discountAmount();
         }
         return amount;
@@ -84,7 +83,7 @@ public class StoreService {
 
     private int calcPromotionDiscountAmount(List<FinalBonus> bonuses) {
         int amount = 0;
-        for(FinalBonus b : bonuses) {
+        for (FinalBonus b : bonuses) {
             amount = amount + b.discountAmount();
         }
         return amount;
