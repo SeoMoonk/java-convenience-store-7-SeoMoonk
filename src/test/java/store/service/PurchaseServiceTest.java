@@ -27,7 +27,7 @@ class PurchaseServiceTest {
     private static final ProductRepository productRepository = new ProductRepositoryImpl();
     private static final ProductService productService = new ProductService(promotionService, productRepository);
     private static final StoreService storeService = new StoreService(promotionService, productService);
-    private static final PurchaseService purchaseService = new PurchaseService(productService, promotionService);
+    private static final PurchaseService purchaseService = new PurchaseService(promotionService, productService);
 
     @BeforeAll
     static void setUp() {
