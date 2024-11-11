@@ -23,4 +23,6 @@ public interface ProductRepository {
     Optional<Product> findByNameAndHasPromotion(String name);
 
     Optional<Product> findByNameAndNotHasPromotion(String name);
+
+    List<String> findAllNames();
 }

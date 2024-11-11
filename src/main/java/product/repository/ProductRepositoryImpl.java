@@ -3,6 +3,7 @@ package product.repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import product.entity.Product;
 import promotion.entity.Promotion;
 
@@ -71,4 +72,10 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .findFirst();
     }
 
+    @Override
+    public List<String> findAllNames() {
+        return storage.stream()
+                .map(Product::getName)
+                .collect(Collectors.toList());
+    }
 }

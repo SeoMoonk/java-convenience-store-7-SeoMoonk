@@ -6,9 +6,11 @@ import static global.utils.StringParser.parseInt;
 import global.constants.FileType;
 import global.utils.FileParser;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import product.constants.ProductPresetKeys;
 import product.dto.response.ProductInfo;
 import product.entity.Product;
@@ -33,6 +35,24 @@ public class ProductService {
         for (Map<String, String> dataSet : productFileDataSets) {
             createByDataSet(dataSet);
         }
+        settingPairProduct();
+    }
+
+    private void settingPairProduct() {
+        Set<String> productNames = getAllNames();
+        for (String name : productNames) {
+            List<Product> productsByName = getAllByName(name);
+            if (productsByName.size() == 1) {
+                Product product = productsByName.get(0);
+                Product newProduct = new Product(product.getName(), product.getPrice(), 0, null);
+                productRepository.save(newProduct);
+            }
+        }
+    }
+
+    private Set<String> getAllNames() {
+        List<String> productNames = productRepository.findAllNames();
+        return new HashSet<>(productNames);
     }
 
     private void createByDataSet(Map<String, String> dataSet) {
@@ -92,7 +112,7 @@ public class ProductService {
         for (Promotion promotion : promotions) {
             Optional<Product> maybeProduct = getByNameAndPromotion(request.productName(), promotion);
 
-            if(maybeProduct.isPresent()) {
+            if (maybeProduct.isPresent()) {
                 int minQuantity = promotion.getBonusQuantity() + promotion.getConditionQuantity();
                 return maybeProduct.get().getQuantity() >= minQuantity;
             }
