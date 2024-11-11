@@ -9,23 +9,25 @@ import static store.constants.StoreStatic.NEGATIVE_ANSWER;
 import static store.constants.StoreStatic.POSITIVE_ANSWER;
 
 import store.constants.StoreErrorCode;
+import store.view.StoreOutputView;
 
 public class StoreValidator {
 
     public static void validatePurchaseRequest(String purchaseRequestItem) {
         purchaseRequestFormatValidate(purchaseRequestItem);
-        purchaseRequestQuantityValidate(purchaseRequestItem.split(ITEM_NAME_QUANTITY_SEPARATOR)[1]);
+        purchaseRequestQuantityValidate(
+                purchaseRequestItem.split(ITEM_NAME_QUANTITY_SEPARATOR)[1].replaceAll(ITEM_SUFFIX, ""));
     }
 
     public static void validateAnswerForAdditionalQuestion(String answer) {
-        if(answer.equals(POSITIVE_ANSWER) || answer.equals(NEGATIVE_ANSWER)) {
+        if (!(answer.equals(POSITIVE_ANSWER) || answer.equals(NEGATIVE_ANSWER))) {
             throw new IllegalArgumentException(StoreErrorCode.INVALID_INPUT.getMsgWithPrefix());
         }
     }
 
     private static void purchaseRequestFormatValidate(String purchaseRequestItem) {
         if (!purchaseRequestItem.startsWith(ITEM_PREFIX) || !purchaseRequestItem.endsWith(ITEM_SUFFIX)
-                || !purchaseRequestItem.contains(ITEMS_SEPARATOR)) {
+                || !purchaseRequestItem.contains(ITEM_NAME_QUANTITY_SEPARATOR)) {
             throw new IllegalArgumentException(StoreErrorCode.PURCHASE_REQUEST_FORMAT_INVALID.getMsgWithPrefix());
         }
     }
@@ -39,25 +41,27 @@ public class StoreValidator {
     }
 
     private static void quantityBlankValidate(String quantityInput) {
-        if(quantityInput.contains(" ") || quantityInput.isBlank()) {
-            throw new IllegalArgumentException(StoreErrorCode.PURCHASE_REQUEST_FORMAT_INVALID.getMsgWithPrefix());
+        if (quantityInput.contains(" ") || quantityInput.isBlank()) {
+            throw new IllegalArgumentException(
+                    StoreErrorCode.PURCHASE_REQUEST_FORMAT_INVALID.getMsgWithPrefix() + quantityInput);
         }
     }
 
     private static void quantityNegativeSignValidate(String quantityInput) {
-        if(quantityInput.contains("-")) {
-            throw new IllegalArgumentException(StoreErrorCode.PURCHASE_REQUEST_FORMAT_INVALID.getMsgWithPrefix());
+        if (quantityInput.contains("-")) {
+            throw new IllegalArgumentException(
+                    StoreErrorCode.PURCHASE_REQUEST_FORMAT_INVALID.getMsgWithPrefix() + quantityInput);
         }
     }
 
     private static void quantityWithZeroValidate(String quantityInput) {
-        if(quantityInput.startsWith("0")) {
+        if (quantityInput.startsWith("0")) {
             throw new IllegalArgumentException(StoreErrorCode.PURCHASE_REQUEST_FORMAT_INVALID.getMsgWithPrefix());
         }
     }
 
     private static void quantityWithPlusSignValidate(String quantityInput) {
-        if(quantityInput.startsWith("+")) {
+        if (quantityInput.startsWith("+")) {
             throw new IllegalArgumentException(StoreErrorCode.PURCHASE_REQUEST_FORMAT_INVALID.getMsgWithPrefix());
         }
     }

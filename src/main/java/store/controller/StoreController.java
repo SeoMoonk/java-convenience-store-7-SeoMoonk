@@ -44,7 +44,7 @@ public class StoreController {
             ProcessedPurchaseRequest processedPurchaseRequest = chooseProducts();
             confirmOrder(processedPurchaseRequest);
             provideReceipt(processedPurchaseRequest);
-        } while (questionForAdditionalPurchase().equals("Y"));
+        } while (questionForAdditionalPurchase());
     }
 
     private ProcessedPurchaseRequest chooseProducts() {
