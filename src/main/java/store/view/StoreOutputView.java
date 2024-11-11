@@ -31,6 +31,10 @@ public class StoreOutputView {
         System.out.println(sb);
     }
 
+    public void printErrorMsg(String msg) {
+        System.out.println(msg);
+    }
+
     private StringBuilder printPurchaseItems(List<FinalPurchase> purchaseItems, StringBuilder sb) {
         if (!purchaseItems.isEmpty()) {
             sb.append("==============W 편의점================\n");

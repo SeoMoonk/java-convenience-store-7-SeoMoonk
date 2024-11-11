@@ -53,45 +53,31 @@ public class PurchaseService {
         return results;
     }
 
-    public PromotionApplyResult applyCustomerAnswer(String input, PromotionApplyResult result) {
+    public PromotionApplyResult applyCustomerAnswer(boolean isPositiveAnswer, PromotionApplyResult result) {
 
         if (result.state() == PromotionApplyState.ADDITIONAL_PROMOTION_AVAILABLE) {
-            return fixForAdditionalCondition(input, result);
+            return fixForAdditionalCondition(isPositiveAnswer, result);
         }
 
         if (result.state() == PromotionApplyState.PARTIAL_PROMOTION_APPLIED) {
-            return fixForPartialCondition(input, result);
+            return fixForPartialCondition(isPositiveAnswer, result);
         }
 
         throw new IllegalArgumentException("프로모션 요청이 잘못되었습니다");
     }
 
-    private PromotionApplyResult fixForAdditionalCondition(String input, PromotionApplyResult result) {
-
-        if (input.equals("Y")) {
+    private PromotionApplyResult fixForAdditionalCondition(boolean isPositiveAnswer, PromotionApplyResult result) {
+        if (isPositiveAnswer) {
             return result.applyPromotion();
         }
-
-        if (input.equals("N")) {
-            return result.excludePromotion();
-        }
-
-        //FIXME: 리팩토링
-        throw new IllegalArgumentException("질문에 대한 응답은 (Y/N) 으로만 응답해야 합니다" + input);
+        return result.excludePromotion();
     }
 
-    private PromotionApplyResult fixForPartialCondition(String input, PromotionApplyResult result) {
-
-        if (input.equals("Y")) {
+    private PromotionApplyResult fixForPartialCondition(boolean isPositiveAnswer, PromotionApplyResult result) {
+        if (isPositiveAnswer) {
             return result.applyNormalPurchase();
         }
-
-        if (input.equals("N")) {
-            return result.excludeNormalPurchase();
-        }
-
-        //FIXME: 리팩토링
-        throw new IllegalArgumentException("질문에 대한 응답은 (Y/N) 으로만 응답해야 합니다" + input);
+        return result.excludeNormalPurchase();
     }
 
     public List<PurchaseForm> processingPurChaseRequests(List<PromotionApplyResult> promotionResults,

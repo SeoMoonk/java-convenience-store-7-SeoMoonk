@@ -4,7 +4,9 @@ import static store.constants.StoreStatic.ITEMS_SEPARATOR;
 import static store.constants.StoreStatic.ITEM_NAME_QUANTITY_SEPARATOR;
 import static store.constants.StoreStatic.ITEM_PREFIX;
 import static store.constants.StoreStatic.ITEM_SUFFIX;
+import static store.utils.StoreValidator.validatePurchaseRequest;
 
+import global.constants.GlobalErrorCode;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ public class StringParser {
         try {
             number = Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("파일의 데이터를 숫자로 변환할 수 없습니다 : " + input);
+            throw new NumberFormatException(GlobalErrorCode.CANNOT_PARSING_NUMBER.getMsgWithPrefix() + " : " + input);
         }
         return number;
     }
@@ -28,7 +30,8 @@ public class StringParser {
         try {
             date = LocalDate.parse(input);
         } catch (DateTimeParseException e) {
-            throw new DateTimeParseException("파일의 데이터를 날짜로 변환할 수 없습니다 : " + input, input, e.getErrorIndex());
+            throw new DateTimeParseException(GlobalErrorCode.CANNOT_PARSING_DATETIME.getMsgWithPrefix() + " : " + input,
+                    input, e.getErrorIndex());
         }
         return date;
     }
@@ -37,6 +40,7 @@ public class StringParser {
         List<PurchaseRequest> purchaseRequests = new ArrayList<>();
         String[] itemDataSets = input.split(ITEMS_SEPARATOR);
         for (String itemSet : itemDataSets) {
+            validatePurchaseRequest(itemSet);
             String nameAndQuantity = itemSet.replaceFirst(ITEM_PREFIX, "")
                     .replaceFirst(ITEM_SUFFIX, "");
             String[] nameQuantitySet = nameAndQuantity.split(ITEM_NAME_QUANTITY_SEPARATOR);

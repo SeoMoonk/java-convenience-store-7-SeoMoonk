@@ -1,6 +1,8 @@
 package store.controller;
 
 import static global.utils.StringParser.parseShoppingList;
+import static store.constants.StoreStatic.POSITIVE_ANSWER;
+import static store.utils.StoreValidator.validateAnswerForAdditionalQuestion;
 
 import camp.nextstep.edu.missionutils.Console;
 import java.util.ArrayList;
@@ -88,9 +90,14 @@ public class StoreController {
     }
 
     private List<PurchaseRequest> shoppingRequest() {
-        String requestInput = storeInputView.inputShoppingList();
-        List<PurchaseRequest> purchaseRequests = parseShoppingList(requestInput);
-        return purchaseRequests;
+        try {
+            String requestInput = storeInputView.inputShoppingList();
+            List<PurchaseRequest> purchaseRequests = parseShoppingList(requestInput);
+            return purchaseRequests;
+        } catch (Exception e) {
+            storeOutputView.printErrorMsg(e.getMessage());
+            return shoppingRequest();
+        }
     }
 
     private void checkPurchaseRequests(List<PurchaseRequest> purchaseRequests) {
@@ -119,8 +126,7 @@ public class StoreController {
         List<PromotionApplyResult> modifiedResults = new ArrayList<>();
         for (PromotionApplyResult result : results) {
             if (!result.state().isSucceseState()) {
-                String input = questionForApplyPromotion(result);
-                modifiedResults.add(purchaseService.applyCustomerAnswer(input, result));
+                modifiedResults.add(purchaseService.applyCustomerAnswer(questionForApplyPromotion(result), result));
                 continue;
             }
             modifiedResults.add(result);
@@ -128,26 +134,28 @@ public class StoreController {
         return modifiedResults;
     }
 
-    private String questionForApplyPromotion(PromotionApplyResult result) {
+    private boolean questionForApplyPromotion(PromotionApplyResult result) {
         String input;
         try {
             input = storeInputView.inputAnswerAboutPromotion(result);
+            validateAnswerForAdditionalQuestion(input);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return questionForApplyPromotion(result);
         }
-        return input;
+        return input.equals(POSITIVE_ANSWER);
     }
 
-    private String questionForAdditionalPurchase() {
+    private boolean questionForAdditionalPurchase() {
         String input;
         try {
             input = storeInputView.inputAnswerAboutAdditionalPurchase();
+            validateAnswerForAdditionalQuestion(input);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return questionForAdditionalPurchase();
         }
-        return input;
+        return input.equals(POSITIVE_ANSWER);
     }
 
     public ReceiptPriceInfo processingReceiptPriceInfo(ReceiptItems receiptItems,
@@ -159,12 +167,12 @@ public class StoreController {
         String input;
         try {
             input = storeInputView.inputAnswerAboutMembership();
-            return input.equals("Y");   //FIXME: Y가 아니면 전부 FALSE
+            validateAnswerForAdditionalQuestion(input);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            isContainsMembershipDiscount();
+            return isContainsMembershipDiscount();
         }
-        return false;
+        return input.equals(POSITIVE_ANSWER);
     }
 
     public void printReceipt(ReceiptItems receiptItems, ReceiptPriceInfo receiptPriceInfo) {

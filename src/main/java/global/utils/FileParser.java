@@ -4,8 +4,10 @@ import static global.constants.GlobalStatic.ERROR_MSG_PREFIX;
 import static global.constants.GlobalStatic.FILE_DATA_SEPARATOR;
 
 import global.constants.FileType;
+import global.constants.GlobalErrorCode;
 import global.utils.Validator.FileValidator;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class FileParser {
             values = parsingValues(keys, br);
             br.close();
         } catch (Exception e) {
-            System.out.println(ERROR_MSG_PREFIX + "파일의 경로나 내용이 올바르지 않습니다");
+            throw new IllegalArgumentException(GlobalErrorCode.FILE_SPECIFIC_ERROR.getMsgWithPrefix());
         }
         return values;
     }
@@ -42,8 +44,8 @@ public class FileParser {
             while ((line = br.readLine()) != null) {
                 values.add(getDataSet(line, keys));
             }
-        } catch (IOException e) {
-            System.out.println(ERROR_MSG_PREFIX + "파일의 내용이 올바르지 않습니다.");
+        } catch (Exception e) {
+            throw new IllegalArgumentException(GlobalErrorCode.FILE_CONTENTS_INVALID.getMsgWithPrefix());
         }
         return values;
     }
