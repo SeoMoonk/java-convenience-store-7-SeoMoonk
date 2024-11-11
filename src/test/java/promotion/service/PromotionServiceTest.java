@@ -6,7 +6,6 @@ import static store.constants.StoreErrorCode.NONE_EXISTENT_PROMOTION;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

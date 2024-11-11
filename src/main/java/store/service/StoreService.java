@@ -45,7 +45,7 @@ public class StoreService {
         return integrateReceiptItems(promotionReceiptItems, normalReceiptItems);
     }
 
-    public ReceiptItems convertToReceiptItemByPromotion(List<PromotionApplyResult> promotionResults) {
+    private ReceiptItems convertToReceiptItemByPromotion(List<PromotionApplyResult> promotionResults) {
         List<FinalPurchase> finalPurchases = new ArrayList<>();
         List<FinalBonus> finalBonuses = new ArrayList<>();
         for (PromotionApplyResult result : promotionResults) {
@@ -59,7 +59,7 @@ public class StoreService {
         return new ReceiptItems(finalPurchases, finalBonuses);
     }
 
-    public ReceiptItems convertToReceiptItemByNormal(List<PurchaseRequest> normalRequests) {
+    private ReceiptItems convertToReceiptItemByNormal(List<PurchaseRequest> normalRequests) {
         List<FinalPurchase> finalPurchases = new ArrayList<>();
         for (PurchaseRequest request : normalRequests) {
             String productName = request.productName();

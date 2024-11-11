@@ -2,7 +2,6 @@ package store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static store.constants.StoreErrorCode.CANNOT_REQUEST_OVER_STORED_QUANTITY;
 
 import java.util.ArrayList;
@@ -113,7 +112,4 @@ class PurchaseServiceTest {
         assertThat(modifiedApplyResult.bonusQuantity()).isEqualTo(1 + 1);
         assertThat(modifiedApplyResult.state()).isEqualTo(PromotionApplyState.FULL_PROMOTION_APPLIED);
     }
-
-
-
 }

@@ -1,20 +1,20 @@
 package store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static product.constants.ProductStatic.MONETARY_UNIT;
+import static product.constants.ProductStatic.PRODUCT_UNIT;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import product.dto.ProductInfo;
 import product.repository.ProductRepository;
 import product.repository.ProductRepositoryImpl;
 import product.service.ProductService;
 import promotion.repository.PromotionRepository;
 import promotion.repository.PromotionRepositoryImpl;
 import promotion.service.PromotionService;
-import store.dto.request.PurchaseRequest;
 
 class StoreServiceTest {
 
@@ -29,46 +29,17 @@ class StoreServiceTest {
         storeService.setUp();
     }
 
-//    @Test
-//    @DisplayName("사용자가 구매를 요청했을 때, 물품을 찾을 수 없다면 예외가 발생한다.")
-//    void t001() {
-//        //given
-//        List<PurchaseRequest> purchaseRequests = new ArrayList<>();
-//        purchaseRequests.add(new PurchaseRequest("invalid", 3));
-//
-//        //when, then
-//        assertThatThrownBy(() -> storeService.checkStorageStatus(purchaseRequests))
-//                .isInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("invalid");
-//    }
-//
-//    @Test
-//    @DisplayName("사용자가 구매를 요청했을 때, 물품의 재고가 부족하다면 예외가 발생한다.")
-//    void t002() {
-//        //given
-//        List<PurchaseRequest> purchaseRequests = new ArrayList<>();
-//        purchaseRequests.add(new PurchaseRequest("콜라", 300));
-//
-//        //when, then
-//        assertThatThrownBy(() -> storeService.checkStorageStatus(purchaseRequests))
-//                .isInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("재고");
-//    }
-//
-//    @Test
-//    @DisplayName("사용자가 성공적으로 구매를 수행하면, 물품의 보유 수량이 변경된다.")
-//    void t003() {
-//        //given
-//        List<PurchaseRequest> purchaseRequests = new ArrayList<>();
-//        purchaseRequests.add(new PurchaseRequest("콜라", 5));
-//        int beforeQuantity = productService.getByName("콜라").getQuantity();
-//
-//        //when
-//        storeService.purchase(purchaseRequests);
-//
-//        //then
-//        int afterQuantity = productService.getByName("콜라").getQuantity();
-//        assertThat(afterQuantity).isLessThan(beforeQuantity);
-//    }
+    @Test
+    @DisplayName("상점은 모든 재고에 대한 변환된 정보를 받아올 수 있다")
+    void t001() {
+        String name = "콜라";
+        String price = String.format("%,d", 1000) + MONETARY_UNIT;
+        String quantity = 10 + PRODUCT_UNIT;
+        String promotionName = "탄산2+1";
+        ProductInfo testInfo = new ProductInfo(name, price, quantity, promotionName);
 
+        List<ProductInfo> productInfos = storeService.getProductInfos();
+
+        assertThat(productInfos).contains(testInfo);
+    }
 }
