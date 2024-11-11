@@ -17,12 +17,12 @@ import store.dto.request.SeparatedPurchaseRequest;
 
 public class PurchaseService {
 
-    private final ProductService productService;
     private final PromotionService promotionService;
+    private final ProductService productService;
 
-    public PurchaseService(ProductService productService, PromotionService promotionService) {
-        this.productService = productService;
+    public PurchaseService(PromotionService promotionService, ProductService productService) {
         this.promotionService = promotionService;
+        this.productService = productService;
     }
 
     public void checkPurchaseRequests(List<PurchaseRequest> purchaseRequests) {
